@@ -1,9 +1,10 @@
 package tg
 
 import (
-	"github.com/bochkov/gobot/db"
 	"log"
 	"strings"
+
+	"github.com/bochkov/gobot/db"
 )
 
 type MethodCustomize func(message *SendMessage[string])
@@ -21,7 +22,7 @@ func (p *PushService) Push(text string, mc ...MethodCustomize) {
 		log.Print("no token specified")
 		return
 	}
-	chatId := db.GetProp(db.ChatIdKey, "") // TODO
+	chatId := db.GetProp(db.ChatAutoSend, "") // TODO
 	if chatId == "" {
 		log.Print("no chat.id specified")
 		return
