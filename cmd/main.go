@@ -2,6 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/bochkov/gobot/db"
 	"github.com/bochkov/gobot/internal/anekdot"
 	"github.com/bochkov/gobot/internal/auto"
@@ -11,12 +19,6 @@ import (
 	"github.com/bochkov/gobot/util"
 	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func configureTasks(scheduler *gocron.Scheduler) {
@@ -52,7 +54,12 @@ func main() {
 	/// logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	/// db
-	db.NewPool(ctx, "postgres://resnyx:resnyx@10.10.10.10:5432/resnyx")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	name := os.Getenv("DB_NAME")
+	db.NewPool(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, pass, host, port, name))
 	defer db.GetPool().Close()
 	if err := db.GetPool().Ping(ctx); err != nil {
 		log.Print(err)
