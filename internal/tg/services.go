@@ -62,9 +62,10 @@ func (a *Auto) IsMatch(text string) bool {
 }
 
 func (a *Auto) Answer(msg *Message) []Method {
-	digits := regexp.MustCompile(`\\d+`).FindString(msg.Text)
-	if digits == "" {
-		name := msg.Text[strings.Index(msg.Text, " "):]
+	re := regexp.MustCompile(`(?P<code>\d+)`)
+	matches := re.FindStringSubmatch(msg.Text)
+	if len(matches) == 0 {
+		name := msg.Text[strings.Index(msg.Text, " ")+1:]
 		regions, err := auto.FindRegionByName(name)
 		if err != nil {
 			log.Print(err)
@@ -72,6 +73,7 @@ func (a *Auto) Answer(msg *Message) []Method {
 			return a.createMessages(msg.Chat.Id, regions)
 		}
 	} else {
+		var digits = matches[re.SubexpIndex("code")]
 		region, err := auto.FindRegionByCode(digits)
 		if err != nil {
 			log.Print(err)
@@ -117,7 +119,7 @@ func (c Cbr) IsMatch(text string) bool {
 
 func (c Cbr) Answer(msg *Message) []Method {
 	text := strings.ToUpper(msg.Text)
-	currencies := regexp.MustCompile(`\\s+`).Split(text, -1)[1:]
+	currencies := regexp.MustCompile(`\s+`).Split(text, -1)[1:]
 	if len(currencies) == 0 {
 		currencies = append(currencies, "USD")
 		currencies = append(currencies, "EUR")

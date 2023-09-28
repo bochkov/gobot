@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/carlmjohnson/requests"
-	"golang.org/x/net/html"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/carlmjohnson/requests"
+	"golang.org/x/net/html"
 )
 
 type Torrent struct {
@@ -79,7 +80,7 @@ func (s *Service) fetch(tor *Torrent) error {
 		return err
 	}
 	disposition := headers.Get("Content-Disposition")
-	re := regexp.MustCompile(".* filename=\"(?P<name>.*)\"")
+	re := regexp.MustCompile(`.* filename="(?P<name>.*)"`)
 	var name = re.FindStringSubmatch(disposition)[re.SubexpIndex("name")]
 	if name == "" {
 		name = "noname"
