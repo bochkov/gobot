@@ -2,15 +2,16 @@ package tg
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strings"
+
 	"github.com/bochkov/gobot/internal/anekdot"
 	"github.com/bochkov/gobot/internal/auto"
 	"github.com/bochkov/gobot/internal/cbr"
 	"github.com/bochkov/gobot/internal/forismatic"
 	"github.com/bochkov/gobot/internal/rutor"
-	"log"
-	"os"
-	"regexp"
-	"strings"
 )
 
 type Service interface {
@@ -61,8 +62,7 @@ func (a *Auto) IsMatch(text string) bool {
 }
 
 func (a *Auto) Answer(msg *Message) []Method {
-	re, _ := regexp.Compile("\\d+")
-	digits := re.FindString(msg.Text)
+	digits := regexp.MustCompile(`\\d+`).FindString(msg.Text)
 	if digits == "" {
 		name := msg.Text[strings.Index(msg.Text, " "):]
 		regions, err := auto.FindRegionByName(name)
@@ -117,7 +117,7 @@ func (c Cbr) IsMatch(text string) bool {
 
 func (c Cbr) Answer(msg *Message) []Method {
 	text := strings.ToUpper(msg.Text)
-	currencies := regexp.MustCompile("\\s+").Split(text, -1)[1:]
+	currencies := regexp.MustCompile(`\\s+`).Split(text, -1)[1:]
 	if len(currencies) == 0 {
 		currencies = append(currencies, "USD")
 		currencies = append(currencies, "EUR")

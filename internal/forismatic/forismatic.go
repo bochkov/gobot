@@ -3,10 +3,11 @@ package forismatic
 import (
 	"context"
 	"fmt"
-	"github.com/bochkov/gobot/util"
-	"github.com/carlmjohnson/requests"
 	"log"
 	"net/http"
+
+	"github.com/bochkov/gobot/util"
+	"github.com/carlmjohnson/requests"
 )
 
 type Cite struct {
@@ -17,7 +18,7 @@ type Cite struct {
 	QuoteLink   string `json:"QuoteLink"`
 }
 
-func (c Cite) String() string {
+func (c *Cite) String() string {
 	return fmt.Sprintf("%s %s", c.QuoteText, c.QuoteAuthor)
 }
 
