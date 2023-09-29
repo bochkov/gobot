@@ -2,8 +2,8 @@ package cbr
 
 import (
 	"context"
-	"github.com/bochkov/gobot/db"
-	"github.com/bochkov/gobot/util"
+	"github.com/bochkov/gobot/internal/db"
+	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
 	"log"
 	"sort"

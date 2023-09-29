@@ -1,7 +1,7 @@
 package auto
 
 import (
-	"github.com/bochkov/gobot/util"
+	"github.com/bochkov/gobot/internal/util"
 	"net/http"
 )
 

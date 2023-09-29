@@ -3,6 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/bochkov/gobot/internal/db"
+	anekdot2 "github.com/bochkov/gobot/internal/resnyx/anekdot"
+	"github.com/bochkov/gobot/internal/resnyx/auto"
+	"github.com/bochkov/gobot/internal/resnyx/cbr"
+	"github.com/bochkov/gobot/internal/resnyx/forismatic"
+	"github.com/bochkov/gobot/internal/tg"
+	"github.com/bochkov/gobot/internal/util"
 	"log"
 	"net/http"
 	"os"
@@ -10,13 +17,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bochkov/gobot/db"
-	"github.com/bochkov/gobot/internal/anekdot"
-	"github.com/bochkov/gobot/internal/auto"
-	"github.com/bochkov/gobot/internal/cbr"
-	"github.com/bochkov/gobot/internal/forismatic"
-	"github.com/bochkov/gobot/internal/tg"
-	"github.com/bochkov/gobot/util"
 	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"
 )
@@ -25,7 +25,7 @@ func configureTasks(scheduler *gocron.Scheduler) {
 	pushServ := &tg.PushService{}
 	if _, err := scheduler.Cron("0 6 * * *").Do(func() {
 		log.Print("push anekdot")
-		text := anekdot.NewBaneks().PushText()
+		text := anekdot2.NewBaneks().PushText()
 		if text == "" {
 			return
 		}
@@ -41,7 +41,7 @@ func configureTasks(scheduler *gocron.Scheduler) {
 func configureController(router *mux.Router) {
 	router.HandleFunc("/bot/{token}", tg.BotHandler).Methods(http.MethodPost)
 	router.HandleFunc("/cite", forismatic.CiteHandler).Methods(http.MethodGet)
-	router.HandleFunc("/anekdot", anekdot.AnekHandler).Methods(http.MethodGet)
+	router.HandleFunc("/anekdot", anekdot2.AnekHandler).Methods(http.MethodGet)
 	router.HandleFunc("/auto/forCode", auto.CodesHandler).Methods(http.MethodGet)
 	router.HandleFunc("/auto/forRegion", auto.RegionsHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cbr/latest/all", cbr.LatestRate).Methods(http.MethodGet)
@@ -53,6 +53,7 @@ func main() {
 	ctx := context.Background()
 	/// logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	/// db
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")

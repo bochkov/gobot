@@ -1,7 +1,7 @@
 package cbr
 
 import (
-	"github.com/bochkov/gobot/util"
+	"github.com/bochkov/gobot/internal/util"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"

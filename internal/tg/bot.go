@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/bochkov/gobot/util"
+	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
 	"github.com/gorilla/mux"
 	"log"

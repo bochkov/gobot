@@ -2,7 +2,7 @@ package tg
 
 import (
 	"fmt"
-	"github.com/bochkov/gobot/util"
+	"github.com/bochkov/gobot/internal/util"
 	"io"
 	"mime/multipart"
 )

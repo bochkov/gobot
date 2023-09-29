@@ -2,7 +2,7 @@ package auto
 
 import (
 	"context"
-	"github.com/bochkov/gobot/db"
+	"github.com/bochkov/gobot/internal/db"
 	"log"
 )
 
