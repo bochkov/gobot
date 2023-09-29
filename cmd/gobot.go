@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/bochkov/gobot/internal/db"
-	anekdot2 "github.com/bochkov/gobot/internal/resnyx/anekdot"
+	"github.com/bochkov/gobot/internal/resnyx/anekdot"
 	"github.com/bochkov/gobot/internal/resnyx/auto"
 	"github.com/bochkov/gobot/internal/resnyx/cbr"
 	"github.com/bochkov/gobot/internal/resnyx/forismatic"
+	"github.com/bochkov/gobot/internal/tasks"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/util"
 	"log"
@@ -21,27 +22,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func configureTasks(scheduler *gocron.Scheduler) {
-	pushServ := &tg.PushService{}
-	if _, err := scheduler.Cron("0 6 * * *").Do(func() {
-		log.Print("push anekdot")
-		text := anekdot2.NewBaneks().PushText()
-		if text == "" {
-			return
-		}
-		pushServ.Push(text, func(sm *tg.SendMessage[string]) {
-			sm.SendOptions.DisableWebPagePreview = true
-			sm.SendOptions.DisableNotification = true
-		})
-	}); err != nil {
-		log.Print(err)
-	}
-}
-
 func configureController(router *mux.Router) {
 	router.HandleFunc("/bot/{token}", tg.BotHandler).Methods(http.MethodPost)
 	router.HandleFunc("/cite", forismatic.CiteHandler).Methods(http.MethodGet)
-	router.HandleFunc("/anekdot", anekdot2.AnekHandler).Methods(http.MethodGet)
+	router.HandleFunc("/anekdot", anekdot.AnekHandler).Methods(http.MethodGet)
 	router.HandleFunc("/auto/forCode", auto.CodesHandler).Methods(http.MethodGet)
 	router.HandleFunc("/auto/forRegion", auto.RegionsHandler).Methods(http.MethodGet)
 	router.HandleFunc("/cbr/latest/all", cbr.LatestRate).Methods(http.MethodGet)
@@ -73,7 +57,7 @@ func main() {
 
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
-	configureTasks(scheduler)
+	tasks.ConfigureTasks(scheduler)
 	scheduler.StartAsync()
 
 	/// http server
@@ -97,6 +81,7 @@ func main() {
 	log.Print("stopping app")
 	stopCtx, cStop := context.WithTimeout(ctx, 5*time.Second)
 	defer cStop()
+	scheduler.Stop()
 	if err := srv.Shutdown(stopCtx); err != nil {
 		log.Fatalf("shutdown: %v", err)
 	}

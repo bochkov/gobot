@@ -5,9 +5,10 @@ import (
 )
 
 const (
-	TgBotTokenKey string = "tg.bot.token"
-	ChatAutoSend  string = "chat.auto.send"
-	ChatIdKey     string = "chat.id"
+	TgBotTokenKey    string = "tg.bot.token"
+	ChatAutoSend     string = "chat.auto.send"
+	ChatIdKey        string = "chat.id"
+	AnekdotScheduler string = "schedule.anekdot"
 )
 
 func GetProp(key string, def string) string {
