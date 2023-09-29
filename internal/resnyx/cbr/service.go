@@ -2,13 +2,15 @@ package cbr
 
 import (
 	"context"
-	"github.com/bochkov/gobot/internal/db"
-	"github.com/bochkov/gobot/internal/util"
-	"github.com/carlmjohnson/requests"
 	"log"
 	"sort"
 	"strings"
 	"time"
+	_ "time/tzdata"
+
+	"github.com/bochkov/gobot/internal/db"
+	"github.com/bochkov/gobot/internal/util"
+	"github.com/carlmjohnson/requests"
 )
 
 const (
