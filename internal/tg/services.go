@@ -2,15 +2,16 @@ package tg
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"regexp"
+	"strings"
+
 	"github.com/bochkov/gobot/internal/resnyx/anekdot"
 	"github.com/bochkov/gobot/internal/resnyx/auto"
 	"github.com/bochkov/gobot/internal/resnyx/cbr"
 	"github.com/bochkov/gobot/internal/resnyx/forismatic"
 	"github.com/bochkov/gobot/internal/resnyx/rutor"
-	"log"
-	"os"
-	"regexp"
-	"strings"
 )
 
 type Service interface {

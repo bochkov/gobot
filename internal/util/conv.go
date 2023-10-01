@@ -3,10 +3,11 @@ package util
 import (
 	"encoding/json"
 	"encoding/xml"
-	"golang.org/x/net/html/charset"
 	"log"
 	"net/http"
 	"strings"
+
+	"golang.org/x/net/html/charset"
 )
 
 type Err struct {

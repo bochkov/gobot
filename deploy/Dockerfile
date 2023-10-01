@@ -1,4 +1,4 @@
-## docker build -t renyx . -f build/Dockerfile
+
 FROM golang:alpine AS builder
 WORKDIR /build
 COPY . /build

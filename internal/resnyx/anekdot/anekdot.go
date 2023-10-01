@@ -1,10 +1,11 @@
 package anekdot
 
 import (
-	"github.com/bochkov/gobot/internal/util"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+
+	"github.com/bochkov/gobot/internal/util"
+	"github.com/gorilla/mux"
 )
 
 type Anek struct {

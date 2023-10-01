@@ -3,9 +3,10 @@ package forismatic
 import (
 	"context"
 	"fmt"
-	"github.com/bochkov/gobot/internal/util"
 	"log"
 	"net/http"
+
+	"github.com/bochkov/gobot/internal/util"
 
 	"github.com/carlmjohnson/requests"
 )

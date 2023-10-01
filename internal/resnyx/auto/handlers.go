@@ -1,8 +1,9 @@
 package auto
 
 import (
-	"github.com/bochkov/gobot/internal/util"
 	"net/http"
+
+	"github.com/bochkov/gobot/internal/util"
 )
 
 func CodesHandler(w http.ResponseWriter, req *http.Request) {

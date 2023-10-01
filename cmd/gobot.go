@@ -3,6 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/bochkov/gobot/internal/db"
 	"github.com/bochkov/gobot/internal/resnyx/anekdot"
 	"github.com/bochkov/gobot/internal/resnyx/auto"
@@ -11,12 +18,6 @@ import (
 	"github.com/bochkov/gobot/internal/tasks"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/util"
-	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"

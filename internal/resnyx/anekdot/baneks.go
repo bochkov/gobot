@@ -3,11 +3,12 @@ package anekdot
 import (
 	"context"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/carlmjohnson/requests"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/carlmjohnson/requests"
 )
 
 const url = "https://baneks.ru"

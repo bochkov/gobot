@@ -5,13 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/bochkov/gobot/internal/util"
-	"github.com/carlmjohnson/requests"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"reflect"
 	"strings"
+
+	"github.com/bochkov/gobot/internal/util"
+	"github.com/carlmjohnson/requests"
+	"github.com/gorilla/mux"
 )
 
 var services = []Service{

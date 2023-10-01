@@ -3,11 +3,12 @@ package cbr
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgtype"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Currency struct {

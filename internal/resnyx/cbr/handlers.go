@@ -1,11 +1,12 @@
 package cbr
 
 import (
-	"github.com/bochkov/gobot/internal/util"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/bochkov/gobot/internal/util"
+	"github.com/gorilla/mux"
 )
 
 func LatestRate(w http.ResponseWriter, _ *http.Request) {

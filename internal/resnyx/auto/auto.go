@@ -2,8 +2,9 @@ package auto
 
 import (
 	"context"
-	"github.com/bochkov/gobot/internal/db"
 	"log"
+
+	"github.com/bochkov/gobot/internal/db"
 )
 
 type Code struct {

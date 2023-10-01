@@ -121,11 +121,11 @@ func (c *Cbr) findLatestRate() (*CurrRate, error) {
 	}
 	query2 := `select r.id, r.curr_id, r.num_code, r.char_code, r.nominal, r.name, r.rate_value from currency_rate_record r where r.rate_id = $1`
 	items, err := db.GetPool().Query(ctx, query2, cr.Id)
-	defer items.Close()
 	if err != nil {
 		log.Print(err)
 		return nil, err
 	}
+	defer items.Close()
 	var cri []RateItem
 	for items.Next() {
 		var ri RateItem

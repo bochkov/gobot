@@ -1,9 +1,10 @@
 package tg
 
 import (
-	"github.com/bochkov/gobot/internal/db"
 	"log"
 	"strings"
+
+	"github.com/bochkov/gobot/internal/db"
 )
 
 type MethodCustomize func(message *SendMessage[string])

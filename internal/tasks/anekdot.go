@@ -1,11 +1,12 @@
 package tasks
 
 import (
+	"log"
+
 	"github.com/bochkov/gobot/internal/db"
 	"github.com/bochkov/gobot/internal/resnyx/anekdot"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/go-co-op/gocron"
-	"log"
 )
 
 func configureAnekdot(scheduler *gocron.Scheduler, pushServ *tg.PushService) {
