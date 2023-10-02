@@ -57,6 +57,7 @@ func (a *Auto) Description() string {
 
 func (a *Auto) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "avto") ||
+		strings.Contains(strings.ToLower(text), "auto") ||
 		strings.Contains(strings.ToLower(text), "авто")
 }
 

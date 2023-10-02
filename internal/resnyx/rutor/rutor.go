@@ -61,8 +61,8 @@ func (s *Service) getUrls(url string) (*Torrent, error) {
 			if strings.HasPrefix("magnet://", val) {
 				tor.MagnetUrl = val
 			}
-			if strings.HasPrefix("http", val) {
-				tor.DirectUrl = val
+			if strings.HasPrefix("//d.rutor", val) {
+				tor.DirectUrl = "http:" + val
 			}
 		}
 	}
