@@ -1,2 +1,2 @@
 #!/bin/sh
-docker build -t renyx . -f deploy/Dockerfile
+docker build -t resnyx . -f deploy/Dockerfile
