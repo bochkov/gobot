@@ -3,7 +3,6 @@ package tg
 import (
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"strings"
 
@@ -171,7 +170,7 @@ func (r Rutor) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "rutor")
 }
 
-func (r Rutor) Ans(msg *Message) []Method {
+func (r Rutor) Answer(msg *Message) []Method {
 	torrent, err := rutor.NewService().GetTorrent(msg.Text)
 	if err != nil {
 		return []Method{
@@ -190,18 +189,6 @@ func (r Rutor) Ans(msg *Message) []Method {
 			ChatId:                      msg.Chat.Id,
 			InputFile:                   InputFile{bytes: torrent.Bytes, filename: torrent.Name},
 			Caption:                     torrent.Name,
-			DisableContentTypeDetection: true,
-		},
-	}
-}
-
-func (r Rutor) Answer(msg *Message) []Method {
-	bytes, _ := os.ReadFile("1.torrent")
-	return []Method{
-		&SendDocument[int64]{
-			ChatId:                      msg.Chat.Id,
-			InputFile:                   InputFile{bytes: bytes, filename: "1.torrent"},
-			Caption:                     "1.torrent",
 			DisableContentTypeDetection: true,
 		},
 	}
