@@ -58,10 +58,10 @@ func (s *Service) getUrls(url string) (*Torrent, error) {
 	for _, href := range hrefs.Nodes {
 		val := getAttrValue(href, "href")
 		if val != "" {
-			if strings.HasPrefix("magnet://", val) {
+			if strings.HasPrefix(val, "magnet:") {
 				tor.MagnetUrl = val
 			}
-			if strings.HasPrefix("//d.rutor", val) {
+			if strings.HasPrefix(val, "//d.rutor") {
 				tor.DirectUrl = "http:" + val
 			}
 		}
@@ -74,18 +74,27 @@ func (s *Service) getUrls(url string) (*Torrent, error) {
 
 func (s *Service) fetch(tor *Torrent) error {
 	ctx := context.Background()
-	buf := new(bytes.Buffer)
 	headers := http.Header{}
-	if err := requests.URL(tor.DirectUrl).ToBytesBuffer(buf).ToHeaders(headers).Fetch(ctx); err != nil {
+	if err := requests.URL(tor.DirectUrl).
+		ToHeaders(headers).
+		Method(http.MethodGet).
+		Fetch(ctx); err != nil {
 		return err
 	}
 	disposition := headers.Get("Content-Disposition")
-	re := regexp.MustCompile(`.* filename="(?P<name>.*)"`)
+	re := regexp.MustCompile(`.*filename="(?P<name>.*)"`)
 	var name = re.FindStringSubmatch(disposition)[re.SubexpIndex("name")]
 	if name == "" {
 		name = "noname"
 	}
 	tor.Name = name
+
+	buf := new(bytes.Buffer)
+	if err := requests.URL(tor.DirectUrl).
+		ToBytesBuffer(buf).
+		Fetch(ctx); err != nil {
+		return err
+	}
 	tor.Bytes = buf.Bytes()
 	return nil
 }
