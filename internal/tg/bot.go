@@ -58,7 +58,8 @@ func (bot *Bot) Execute(method Method) (*TypedResult[any], error) {
 }
 
 func shouldAnswer(msg *Message) bool {
-	return strings.HasPrefix(msg.Text, "@resnyx") || strings.HasPrefix(msg.Text, "/")
+	return msg != nil &&
+		(strings.HasPrefix(msg.Text, "@resnyx") || strings.HasPrefix(msg.Text, "/"))
 }
 
 func getAnswers(msg *Message) []Method {

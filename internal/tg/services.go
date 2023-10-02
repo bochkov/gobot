@@ -62,7 +62,7 @@ func (a *Auto) IsMatch(text string) bool {
 
 func (a *Auto) Answer(msg *Message) []Method {
 	re := regexp.MustCompile(`(?P<code>\d+)`)
-	matches := re.FindStringSubmatch(msg.Text)
+	matches := re.FindAllStringSubmatch(msg.Text, -1)
 	if len(matches) == 0 {
 		name := msg.Text[strings.Index(msg.Text, " ")+1:]
 		regions, err := auto.FindRegionByName(name)
@@ -72,13 +72,16 @@ func (a *Auto) Answer(msg *Message) []Method {
 			return a.createMessages(msg.Chat.Id, regions)
 		}
 	} else {
-		var digits = matches[re.SubexpIndex("code")]
-		region, err := auto.FindRegionByCode(digits)
-		if err != nil {
-			log.Print(err)
-		} else {
-			return a.createMessages(msg.Chat.Id, []auto.Region{*region})
+		regions := make([]auto.Region, 0)
+		for _, digits := range matches {
+			region, err := auto.FindRegionByCode(digits[1])
+			if err != nil {
+				log.Print(err)
+			} else {
+				regions = append(regions, *region)
+			}
 		}
+		return a.createMessages(msg.Chat.Id, regions)
 	}
 	return a.createMessages(msg.Chat.Id, []auto.Region{})
 }
@@ -171,7 +174,18 @@ func (r Rutor) IsMatch(text string) bool {
 }
 
 func (r Rutor) Answer(msg *Message) []Method {
-	torrent, err := rutor.NewService().GetTorrent(msg.Text)
+	re := regexp.MustCompile(`https?://\S+`)
+	matches := re.FindStringSubmatch(msg.Text)
+	if len(matches) == 0 {
+		return []Method{
+			&SendMessage[int64]{
+				ChatId: msg.Chat.Id,
+				Text:   "не смог выделить URL",
+			},
+		}
+	}
+	var url = matches[0]
+	torrent, err := rutor.NewService().GetTorrent(url)
 	if err != nil {
 		return []Method{
 			&SendMessage[int64]{
