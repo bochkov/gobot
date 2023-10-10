@@ -128,7 +128,15 @@ func (c Cbr) Answer(msg *Message) []Method {
 		currencies = append(currencies, "EUR")
 	}
 	var methods = make([]Method, 0)
-	for _, r := range cbr.NewCbr().LatestRange(currencies) {
+	ranges := cbr.NewCbr().LatestRange(currencies)
+	if len(ranges) != 0 {
+		sm := SendMessage[int64]{
+			ChatId: msg.Chat.Id,
+			Text:   fmt.Sprintf("Курс на %s", ranges[0].Value.Date.Time.Format("02.01.2006")),
+		}
+		methods = append(methods, &sm)
+	}
+	for _, r := range ranges {
 		sm := SendMessage[int64]{
 			ChatId: msg.Chat.Id,
 			Text:   r.String(),
