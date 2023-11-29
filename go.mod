@@ -5,8 +5,8 @@ go 1.21
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/carlmjohnson/requests v0.23.4
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-co-op/gocron v1.34.2
-	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgx/v5 v5.4.3
 	golang.org/x/net v0.15.0
 )

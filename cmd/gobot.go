@@ -10,29 +10,18 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bochkov/gobot/internal/db"
-	"github.com/bochkov/gobot/internal/resnyx/anekdot"
-	"github.com/bochkov/gobot/internal/resnyx/auto"
-	"github.com/bochkov/gobot/internal/resnyx/cbr"
-	"github.com/bochkov/gobot/internal/resnyx/forismatic"
-	"github.com/bochkov/gobot/internal/tasks"
+	"github.com/bochkov/gobot/internal/anekdot"
+	"github.com/bochkov/gobot/internal/autonumbers"
+	"github.com/bochkov/gobot/internal/cbr"
+	"github.com/bochkov/gobot/internal/lib/db"
+	"github.com/bochkov/gobot/internal/lib/router"
+	"github.com/bochkov/gobot/internal/lib/tasks"
+	"github.com/bochkov/gobot/internal/quote"
+	"github.com/bochkov/gobot/internal/rutor"
 	"github.com/bochkov/gobot/internal/tg"
-	"github.com/bochkov/gobot/internal/util"
 
 	"github.com/go-co-op/gocron"
-	"github.com/gorilla/mux"
 )
-
-func configureController(router *mux.Router) {
-	router.HandleFunc("/bot/{token}", tg.BotHandler).Methods(http.MethodPost)
-	router.HandleFunc("/cite", forismatic.CiteHandler).Methods(http.MethodGet)
-	router.HandleFunc("/anekdot", anekdot.AnekHandler).Methods(http.MethodGet)
-	router.HandleFunc("/auto/forCode", auto.CodesHandler).Methods(http.MethodGet)
-	router.HandleFunc("/auto/forRegion", auto.RegionsHandler).Methods(http.MethodGet)
-	router.HandleFunc("/cbr/latest/all", cbr.LatestRate).Methods(http.MethodGet)
-	router.HandleFunc("/cbr/latest", cbr.LatestRates).Methods(http.MethodGet)
-	router.HandleFunc("/cbr/{period:month|year}/{currency}", cbr.PeriodRates).Methods(http.MethodGet)
-}
 
 func main() {
 	ctx := context.Background()
@@ -46,25 +35,53 @@ func main() {
 	pass := os.Getenv("DB_PASSWORD")
 	name := os.Getenv("DB_NAME")
 	db.NewPool(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, pass, host, port, name))
-	defer db.GetPool().Close()
 	if err := db.GetPool().Ping(ctx); err != nil {
 		log.Print(err)
 		os.Exit(1)
 	}
 	var version string
-	if err := db.GetPool().QueryRow(context.Background(), "select version()").Scan(&version); err == nil {
+	if err := db.GetPool().QueryRow(ctx, "select version()").Scan(&version); err == nil {
 		log.Print(version)
 	}
 
+	/// services
+	sAnekdot := anekdot.NewService()
+	sQuotes := quote.NewService()
+	sTorrent := rutor.NewService()
+	sAutonumbers := autonumbers.NewService(
+		autonumbers.NewRepository(
+			db.GetPool(),
+		),
+	)
+	sCbr := cbr.NewService(
+		cbr.NewRepository(
+			db.GetPool(),
+		),
+	)
+	sTelegram := tg.NewService(
+		tg.NewAnekdotWorker(sAnekdot),
+		tg.NewAutoWorker(sAutonumbers),
+		tg.NewQuoteWorker(sQuotes),
+		tg.NewCbrWorker(sCbr),
+		tg.NewRutorWorker(sTorrent),
+	)
+
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
-	tasks.ConfigureTasks(scheduler)
+	tasks.Schedule(scheduler, sTelegram, sAnekdot, tasks.SchedParam{
+		Desc: "anekdot", CronProp: db.AnekdotScheduler, CronDef: "0 4 * * *",
+	})
 	scheduler.StartAsync()
 
-	/// http server
-	router := mux.NewRouter()
-	configureController(router)
-	router.Use(util.LogMiddleware)
+	/// handlers
+	handlers := &router.Handlers{
+		Anekdot:  anekdot.NewHandler(sAnekdot),
+		Auto:     autonumbers.NewHandler(sAutonumbers),
+		Cbr:      cbr.NewHandler(sCbr),
+		Quotes:   quote.NewHandler(sQuotes),
+		Telegram: tg.NewHandler(sTelegram),
+	}
+	router := router.ConfigureRouter(handlers)
 	srv := &http.Server{Addr: ":5000", Handler: router}
 
 	// start
@@ -77,14 +94,16 @@ func main() {
 		}
 	}()
 	log.Print("app started")
-
 	<-notifyCtx.Done()
+
 	log.Print("stopping app")
 	stopCtx, cStop := context.WithTimeout(ctx, 5*time.Second)
 	defer cStop()
+
 	scheduler.Stop()
 	if err := srv.Shutdown(stopCtx); err != nil {
 		log.Fatalf("shutdown: %v", err)
 	}
+	db.GetPool().Close()
 	log.Print("app stopped")
 }
