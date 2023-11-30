@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -19,22 +19,24 @@ import (
 	"github.com/bochkov/gobot/internal/quote"
 	"github.com/bochkov/gobot/internal/rutor"
 	"github.com/bochkov/gobot/internal/tg"
+	"github.com/bochkov/gobot/internal/util"
 
 	"github.com/go-co-op/gocron"
 )
 
 func main() {
-	ctx := context.Background()
 	/// logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	/// db
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASSWORD")
-	name := os.Getenv("DB_NAME")
-	db.NewPool(ctx, fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, pass, host, port, name))
+	dbParams, err := util.ParseDbParameters()
+	if err != nil {
+		flag.Usage()
+		panic(err)
+	}
+
+	ctx := context.Background()
+	db.NewPool(ctx, dbParams.ConnectString())
 	if err := db.GetPool().Ping(ctx); err != nil {
 		log.Print(err)
 		os.Exit(1)
@@ -81,8 +83,8 @@ func main() {
 		Quotes:   quote.NewHandler(sQuotes),
 		Telegram: tg.NewHandler(sTelegram),
 	}
-	router := router.ConfigureRouter(handlers)
-	srv := &http.Server{Addr: ":5000", Handler: router}
+	routes := router.ConfigureRouter(handlers)
+	srv := &http.Server{Addr: ":5000", Handler: routes}
 
 	// start
 	notifyCtx, nStop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
