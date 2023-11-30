@@ -8,45 +8,55 @@ import (
 	"strconv"
 )
 
-type DbParams struct {
-	host   string
-	port   int
-	dbname string
-	user   string
-	passwd string
+type Flags struct {
+	dbHost   string
+	dbPort   int
+	dbName   string
+	dbUser   string
+	dbPasswd string
+	port     int
 }
 
-func (p *DbParams) ConnectString() string {
+func (f *Flags) DbConnectString() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s",
-		p.user, p.passwd, p.host, p.port, p.dbname)
+		f.dbUser, f.dbPasswd, f.dbHost, f.dbPort, f.dbName)
 }
 
-func (p *DbParams) isOk() bool {
-	if p.host == "" || p.port == 0 || p.dbname == "" || p.user == "" || p.passwd == "" {
+func (f *Flags) ServeAddr() string {
+	return fmt.Sprintf(":%d", f.port)
+}
+
+func (f *Flags) Port() int {
+	return f.port
+}
+
+func (f *Flags) isOk() bool {
+	if f.dbHost == "" || f.dbPort == 0 || f.dbName == "" || f.dbUser == "" || f.dbPasswd == "" {
 		return false
 	}
 	return true
 }
 
-func obtainFromFlag(p *DbParams) {
-	flag.StringVar(&p.host, "host", "", "database host")
-	flag.IntVar(&p.port, "port", 0, "database port")
-	flag.StringVar(&p.dbname, "db", "", "database name")
-	flag.StringVar(&p.user, "user", "", "database user login")
-	flag.StringVar(&p.passwd, "password", "", "database user password")
+func obtainFromFlag(f *Flags) {
+	flag.StringVar(&f.dbHost, "dbhost", "", "database host")
+	flag.IntVar(&f.dbPort, "dbport", 0, "database port")
+	flag.StringVar(&f.dbName, "dbname", "", "database name")
+	flag.StringVar(&f.dbUser, "dbuser", "", "database user login")
+	flag.StringVar(&f.dbPasswd, "dbpassword", "", "database user password")
+	flag.IntVar(&f.port, "port", 5000, "server port")
 	flag.Parse()
 }
 
-func obtainFromEnv(p *DbParams) {
-	p.host = os.Getenv("DB_HOST")
-	p.port, _ = strconv.Atoi(os.Getenv("DB_PORT"))
-	p.user = os.Getenv("DB_USER")
-	p.passwd = os.Getenv("DB_PASSWORD")
-	p.dbname = os.Getenv("DB_NAME")
+func obtainFromEnv(f *Flags) {
+	f.dbHost = os.Getenv("DB_HOST")
+	f.dbPort, _ = strconv.Atoi(os.Getenv("DB_PORT"))
+	f.dbUser = os.Getenv("DB_USER")
+	f.dbPasswd = os.Getenv("DB_PASSWORD")
+	f.dbName = os.Getenv("DB_NAME")
 }
 
-func ParseDbParameters() (*DbParams, error) {
-	var param DbParams
+func ParseParameters() (*Flags, error) {
+	var param Flags
 
 	obtainFromFlag(&param)
 	if param.isOk() {
@@ -58,6 +68,6 @@ func ParseDbParameters() (*DbParams, error) {
 		return &param, nil
 	}
 
-	return nil, errors.New("cannot get database parameters")
+	return nil, errors.New("cannot parse parameters")
 
 }

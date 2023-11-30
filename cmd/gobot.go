@@ -28,15 +28,15 @@ func main() {
 	/// logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	/// db
-	dbParams, err := util.ParseDbParameters()
+	/// params
+	flags, err := util.ParseParameters()
 	if err != nil {
 		flag.Usage()
 		panic(err)
 	}
 
 	ctx := context.Background()
-	db.NewPool(ctx, dbParams.ConnectString())
+	db.NewPool(ctx, flags.DbConnectString())
 	if err := db.GetPool().Ping(ctx); err != nil {
 		log.Print(err)
 		os.Exit(1)
@@ -84,7 +84,7 @@ func main() {
 		Telegram: tg.NewHandler(sTelegram),
 	}
 	routes := router.ConfigureRouter(handlers)
-	srv := &http.Server{Addr: ":5000", Handler: routes}
+	srv := &http.Server{Addr: flags.ServeAddr(), Handler: routes}
 
 	// start
 	notifyCtx, nStop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
@@ -95,7 +95,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
-	log.Print("app started")
+	log.Printf("app started at %s", srv.Addr)
 	<-notifyCtx.Done()
 
 	log.Print("stopping app")
