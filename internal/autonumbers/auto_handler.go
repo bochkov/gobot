@@ -14,7 +14,7 @@ func NewHandler(s Service) *Handler {
 	return &Handler{Service: s}
 }
 
-func (h *Handler) AutonumbersHandle(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) AutonumbersHandler(w http.ResponseWriter, req *http.Request) {
 	code := req.URL.Query().Get("code")
 	if code != "" {
 		region, err := h.Service.FindRegionByCode(req.Context(), code)

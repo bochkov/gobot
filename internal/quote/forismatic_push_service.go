@@ -5,8 +5,8 @@ import (
 	"log"
 )
 
-func (s *forismatic) PushText() string {
-	quote, err := s.RandomQuote()
+func (f *forismatic) PushText() string {
+	quote, err := f.RandomQuote()
 	if err != nil {
 		log.Print(err)
 		return ""

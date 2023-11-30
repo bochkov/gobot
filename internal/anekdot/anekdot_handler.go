@@ -15,7 +15,7 @@ func NewHandler(s Service) *Handler {
 	return &Handler{Service: s}
 }
 
-func (h *Handler) AnekdotHandle(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) AnekdotHandler(w http.ResponseWriter, req *http.Request) {
 	id, err := strconv.Atoi(req.URL.Query().Get("id"))
 	if err != nil {
 		an, err := h.Service.GetRandom()

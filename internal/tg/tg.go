@@ -11,7 +11,7 @@ type Worker interface {
 }
 
 type Service interface {
-	push.PushService
+	push.Service
 	Execute(method Method, token string) (*TypedResult[any], error)
 	GetAnswers(msg *Message) []Method
 }

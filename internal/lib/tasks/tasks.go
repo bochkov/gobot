@@ -14,7 +14,7 @@ type SchedParam struct {
 	CronDef  string
 }
 
-func Schedule(scheduler *gocron.Scheduler, pushSrv push.PushService, push push.Push, param SchedParam) {
+func Schedule(scheduler *gocron.Scheduler, pushSrv push.Service, push push.Push, param SchedParam) {
 	cron := db.GetProp(param.CronProp, param.CronDef)
 	_, err := scheduler.Cron(cron).Do(func() {
 		log.Printf("execute %s", param.Desc)

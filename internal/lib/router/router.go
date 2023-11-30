@@ -35,8 +35,8 @@ func ConfigureRouter(h *Handlers) *chi.Mux {
 
 	r.Get("/quote", h.Quotes.RandomQuote)
 
-	r.Get("/anekdot", h.Anekdot.AnekdotHandle)
-	r.Get("/auto", h.Auto.AutonumbersHandle)
+	r.Get("/anekdot", h.Anekdot.AnekdotHandler)
+	r.Get("/auto", h.Auto.AutonumbersHandler)
 
 	r.Get("/cbr/latest/all", h.Cbr.LatestRate)
 	r.Get("/cbr/latest", h.Cbr.LatestRates)

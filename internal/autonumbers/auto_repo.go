@@ -16,7 +16,7 @@ func NewRepository(db *pgxpool.Pool) Repository {
 }
 
 func (r *repository) findCodesByRegion(ctx context.Context, id int) ([]string, error) {
-	query := `select c.val from code c where c.region_id = $1`
+	query := `select val from code where region_id = $1`
 	rows, err := r.db.Query(ctx, query, id)
 	if err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func (r *repository) FindRegionByName(ctx context.Context, name string) ([]Regio
 
 func (r *repository) FindRegionByCode(ctx context.Context, code string) (*Region, error) {
 	log.Printf("search region by code = '%s'", code)
-	query := `select r.id rid, r.name rname from region r, code c where r.id = c.region_id and c.val = $1`
+	query := `select r.id rid, r.name rname from region r, code cd where r.id = cd.region_id and cd.val = $1`
 	row := r.db.QueryRow(ctx, query, code)
 
 	var region Region

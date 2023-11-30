@@ -27,6 +27,7 @@ func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
 	if h.shouldAnswer(upd.Message) {
 		go h.sendAnswer(token, upd.Message)
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) shouldAnswer(msg *Message) bool {

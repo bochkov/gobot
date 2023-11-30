@@ -4,6 +4,6 @@ type Push interface {
 	PushText() string
 }
 
-type PushService interface {
+type Service interface {
 	Push(text string)
 }
