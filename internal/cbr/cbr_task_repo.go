@@ -41,6 +41,9 @@ func (t *taskRepo) SaveCurrRate(ctx context.Context, cr CurrRate) {
 				return err
 			}
 		}
+		if err := tx.Commit(ctx); err != nil {
+			return err
+		}
 
 		for _, it := range cr.RateItems {
 			if _, err := t.db.Exec(ctx, query2,
