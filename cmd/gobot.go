@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -21,7 +22,6 @@ import (
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/util"
 
-	"fmt"
 	"github.com/go-co-op/gocron"
 	"github.com/lmittmann/tint"
 )
@@ -47,13 +47,13 @@ func main() {
 	}
 
 	ctx := context.Background()
-	db.NewPool(ctx, flags.DbConnectString())
-	if err := db.GetPool().Ping(ctx); err != nil {
+	dbcp := db.NewPool(ctx, flags.DbConnectString())
+	if err := dbcp.Ping(ctx); err != nil {
 		slog.Error("cannot connect to db", "err", err)
 		os.Exit(1)
 	}
 	var version string
-	if err := db.GetPool().QueryRow(ctx, "select version()").Scan(&version); err == nil {
+	if err := dbcp.QueryRow(ctx, "select version()").Scan(&version); err == nil {
 		slog.Info(version)
 	}
 
@@ -62,14 +62,13 @@ func main() {
 	sQuotes := quote.NewService()
 	sTorrent := rutor.NewService()
 	sAutonumbers := autonumbers.NewService(
-		autonumbers.NewRepository(
-			db.GetPool(),
-		),
+		autonumbers.NewRepository(dbcp),
 	)
 	sCbr := cbr.NewService(
-		cbr.NewRepository(
-			db.GetPool(),
-		),
+		cbr.NewRepository(dbcp),
+	)
+	sCbrTasks := cbr.NewTaskService(
+		cbr.NewTaskRepo(dbcp),
 	)
 	sTelegram := tg.NewService(
 		tg.NewAnekdotWorker(sAnekdot),
@@ -84,6 +83,7 @@ func main() {
 	tasks.Schedule(scheduler, sTelegram, sAnekdot, tasks.SchedParam{
 		Desc: "anekdot", CronProp: db.AnekdotScheduler, CronDef: "0 4 * * *",
 	})
+	sCbrTasks.Schedule(scheduler)
 	scheduler.StartAsync()
 
 	/// handlers
@@ -117,6 +117,6 @@ func main() {
 	if err := srv.Shutdown(stopCtx); err != nil {
 		slog.Warn("shutdown", "err", err)
 	}
-	db.GetPool().Close()
+	dbcp.Close()
 	slog.Info("app stopped")
 }

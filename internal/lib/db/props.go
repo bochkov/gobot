@@ -14,7 +14,7 @@ const (
 func GetProp(key string, def string) string {
 	query := `select p.value from props p where p.key = $1`
 	var res string
-	if err := GetPool().QueryRow(context.Background(), query, key).Scan(&res); err != nil {
+	if err := dbPool.pool.QueryRow(context.Background(), query, key).Scan(&res); err != nil {
 		return def
 	}
 	return res

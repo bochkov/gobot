@@ -2,11 +2,11 @@ package db
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log/slog"
 )
 
 type ConnectionPool interface {
@@ -34,7 +34,7 @@ func (cp *connectionPool) setPool(pool *pgxpool.Pool) {
 var dbPool *connectionPool
 var once sync.Once
 
-func NewPool(ctx context.Context, url string) ConnectionPool {
+func NewPool(ctx context.Context, url string) *pgxpool.Pool {
 	once.Do(func() {
 		dbPool = &connectionPool{}
 		pool, err := pgxpool.New(ctx, url)
@@ -44,9 +44,5 @@ func NewPool(ctx context.Context, url string) ConnectionPool {
 		}
 		dbPool.setPool(pool)
 	})
-	return dbPool
-}
-
-func GetPool() *pgxpool.Pool {
 	return dbPool.getPool()
 }

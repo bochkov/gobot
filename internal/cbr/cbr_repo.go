@@ -2,8 +2,9 @@ package cbr
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log/slog"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type repository struct {
@@ -14,15 +15,9 @@ func NewRepository(db *pgxpool.Pool) Repository {
 	return &repository{db: db}
 }
 
-const (
-	insCurrencyItemQuery     = `insert into currency_item (id, name, eng_name, nominal, parent_code, iso_num_code, iso_char_code) values ($1, $2, $3, $4, $5, $6, $7)`
-	insCurrencyRateQuery     = `insert into currency_rate (date, name) VALUES ($1, $2) returning id`
-	insCurrencyRateItemQuery = `insert into currency_rate_record (curr_id, rate_id, num_code, char_code, nominal, name, rate_value) values ($1, $2, $3, $4, $5, $6, $7)`
-)
-
 func (r *repository) FindRateRecordsByRateId(ctx context.Context, rateId int) ([]RateItem, error) {
 	query :=
-		`SELECT crr.id, crr.curr_id, crr.num_code, crr.char_code, crr.nominal, crr.name, crr.rate_value
+		`SELECT crr.id, crr.curr_id, crr.num_code, crr.char_code, crr.nominal, crr.loc_name, crr.rate_value
 		 FROM currency_rate_record crr 
 		 WHERE crr.rate_id = $1`
 	rows, err := r.db.Query(ctx, query, rateId)
@@ -44,9 +39,9 @@ func (r *repository) FindRateRecordsByRateId(ctx context.Context, rateId int) ([
 
 func (r *repository) LatestRate(ctx context.Context) (*CurrRate, error) {
 	query :=
-		`SELECT cr.id, cr.date, cr.fetch_time, cr.name 
+		`SELECT cr.id, cr.for_date, cr.fetch_time, cr.name_val 
 		 FROM currency_rate cr 
-		 WHERE cr.date = (SELECT max(cr1.date) FROM currency_rate cr1)`
+		 WHERE cr.for_date = (SELECT max(cr1.for_date) FROM currency_rate cr1)`
 	row := r.db.QueryRow(ctx, query)
 
 	var cr CurrRate
@@ -61,4 +56,13 @@ func (r *repository) LatestRate(ctx context.Context) (*CurrRate, error) {
 	}
 	cr.RateItems = records
 	return &cr, nil
+}
+
+func (r *repository) IdCurrencyByCharCode(ctx context.Context, code string) (string, error) {
+	var curId string
+	query := `SELECT id FROM currency_item WHERE iso_char_code=$1`
+	if err := r.db.QueryRow(ctx, query, code).Scan(&curId); err != nil {
+		return "", err
+	}
+	return curId, nil
 }

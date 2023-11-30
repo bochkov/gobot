@@ -2,11 +2,16 @@ package tasks
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/push"
 	"github.com/go-co-op/gocron"
-	"log/slog"
 )
+
+type Scheduled interface {
+	Schedule(schedule *gocron.Scheduler)
+}
 
 type SchedParam struct {
 	Desc     string
