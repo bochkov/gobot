@@ -1,11 +1,11 @@
 package tasks
 
 import (
-	"log"
-
+	"fmt"
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/push"
 	"github.com/go-co-op/gocron"
+	"log/slog"
 )
 
 type SchedParam struct {
@@ -17,7 +17,7 @@ type SchedParam struct {
 func Schedule(scheduler *gocron.Scheduler, pushSrv push.Service, push push.Push, param SchedParam) {
 	cron := db.GetProp(param.CronProp, param.CronDef)
 	_, err := scheduler.Cron(cron).Do(func() {
-		log.Printf("execute %s", param.Desc)
+		slog.Info("execute tasks", "task", param.Desc)
 		text := push.PushText()
 		if text == "" {
 			return
@@ -25,8 +25,8 @@ func Schedule(scheduler *gocron.Scheduler, pushSrv push.Service, push push.Push,
 		pushSrv.Push(text)
 	})
 	if err != nil {
-		log.Fatal(err)
+		slog.Warn(err.Error())
 	} else {
-		log.Printf("scheduled %s at '%s'", param.Desc, cron)
+		slog.Info(fmt.Sprintf("scheduled %s at '%s'", param.Desc, cron))
 	}
 }

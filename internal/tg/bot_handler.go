@@ -2,11 +2,12 @@ package tg
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	"log/slog"
 )
 
 type Handler struct {
@@ -22,7 +23,7 @@ func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
 	if err := json.NewDecoder(req.Body).Decode(&upd); err != nil {
 		return
 	}
-	log.Printf("%+v", upd.Message)
+	slog.Debug(fmt.Sprintf("%+v", upd.Message))
 	token := chi.URLParam(req, "token")
 	if h.shouldAnswer(upd.Message) {
 		go h.sendAnswer(token, upd.Message)
@@ -40,13 +41,13 @@ func (h *Handler) sendAnswer(token string, msg *Message) {
 	for _, method := range methods {
 		res, err := h.Service.Execute(method, token)
 		if err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 			return
 		}
 		if res.Ok {
-			log.Printf("response: %+v", res.Result)
+			slog.Info(fmt.Sprintf("response: %+v", res.Result))
 		} else {
-			log.Printf("response: %d %s", res.ErrorCode, res.Description)
+			slog.Info(fmt.Sprintf("response: %d %s", res.ErrorCode, res.Description))
 		}
 	}
 }

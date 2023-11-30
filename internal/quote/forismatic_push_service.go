@@ -2,13 +2,13 @@ package quote
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 )
 
 func (f *forismatic) PushText() string {
 	quote, err := f.RandomQuote()
 	if err != nil {
-		log.Print(err)
+		slog.Warn(err.Error())
 		return ""
 	}
 	return fmt.Sprintf("Мудрость дня:\n%s", quote)

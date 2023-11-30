@@ -8,6 +8,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/go-co-op/gocron v1.34.2
 	github.com/jackc/pgx/v5 v5.4.3
+	github.com/lmittmann/tint v1.0.3
 	golang.org/x/net v0.15.0
 )
 

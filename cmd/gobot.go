@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,12 +21,23 @@ import (
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/util"
 
+	"fmt"
 	"github.com/go-co-op/gocron"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
 	/// logging
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	slog.SetDefault(
+		slog.New(
+			tint.NewHandler(
+				os.Stdout,
+				&tint.Options{
+					TimeFormat: time.DateTime,
+					Level:      slog.LevelDebug,
+					AddSource:  true,
+				},
+			)))
 
 	/// params
 	flags, err := util.ParseParameters()
@@ -38,12 +49,12 @@ func main() {
 	ctx := context.Background()
 	db.NewPool(ctx, flags.DbConnectString())
 	if err := db.GetPool().Ping(ctx); err != nil {
-		log.Print(err)
+		slog.Error("cannot connect to db", "err", err)
 		os.Exit(1)
 	}
 	var version string
 	if err := db.GetPool().QueryRow(ctx, "select version()").Scan(&version); err == nil {
-		log.Print(version)
+		slog.Info(version)
 	}
 
 	/// services
@@ -92,20 +103,20 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
+			slog.Error("cannot start listener", "err", err)
 		}
 	}()
-	log.Printf("app started at %s", srv.Addr)
+	slog.Info(fmt.Sprintf("app started at addr='%s'", srv.Addr))
 	<-notifyCtx.Done()
 
-	log.Print("stopping app")
+	slog.Info("stopping app")
 	stopCtx, cStop := context.WithTimeout(ctx, 5*time.Second)
 	defer cStop()
 
 	scheduler.Stop()
 	if err := srv.Shutdown(stopCtx); err != nil {
-		log.Fatalf("shutdown: %v", err)
+		slog.Warn("shutdown", "err", err)
 	}
 	db.GetPool().Close()
-	log.Print("app stopped")
+	slog.Info("app stopped")
 }

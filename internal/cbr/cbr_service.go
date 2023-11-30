@@ -2,7 +2,6 @@ package cbr
 
 import (
 	"context"
-	"log"
 	"sort"
 	"strings"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
+	"log/slog"
 )
 
 const (
@@ -54,7 +54,7 @@ func (s *service) LatestRange(c context.Context, currencies []string) []CalcRang
 	for _, cur := range currencies {
 		r, err := s.RangeOf(c, cur, t.AddDate(0, 0, -14), t.AddDate(0, 0, 1))
 		if err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 		} else {
 			sort.Sort(CurrRangeRecordByDateReverse(r.Records))
 			rng := NewCalcRange(cur, r.Records[0], r.Records[1])
@@ -89,7 +89,7 @@ func (s *service) RangeOf(c context.Context, code string, from time.Time, to tim
 		Param("VAL_NM_RQ", curId).
 		ToString(&data).
 		Fetch(ctx); err != nil {
-		log.Print(err)
+		slog.Warn(err.Error())
 		return nil, err
 	}
 
@@ -101,29 +101,29 @@ func (s *service) RangeOf(c context.Context, code string, from time.Time, to tim
 }
 
 func (s *service) fetchAndSaveCurrencies() {
-	log.Print("fetch currencies")
+	slog.Debug("fetch currencies")
 	ctx := context.Background()
 	var data string
 	if err := requests.URL(CurrencyUrl).
 		UserAgent("curl/8.0.1").
 		ToString(&data).
 		Fetch(ctx); err != nil {
-		log.Print(err)
+		slog.Warn(err.Error())
 		return
 	}
 	currency := new(Currency)
 	if err := util.FromXml(data, &currency); err != nil {
-		log.Print(err)
+		slog.Warn(err.Error())
 		return
 	}
 	if _, err := db.GetPool().Exec(ctx, `truncate table currency_item`); err != nil {
-		log.Print(err)
+		slog.Warn(err.Error())
 		return
 	}
 	for _, it := range currency.Items {
 		if _, err := db.GetPool().Exec(ctx, insCurrencyItemQuery,
 			it.Id, it.Name, it.EngName, it.Nominal, it.ParentCode, it.IsoNumCode, it.IsoCharCode); err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 		}
 	}
 }
@@ -145,31 +145,31 @@ func (s *service) needUpdate() bool {
 
 func (s *service) updateRatesIfNeeded() {
 	if s.needUpdate() {
-		log.Print("fetch currency rates")
+		slog.Debug("fetch currency rates")
 		ctx := context.Background()
 		var data string
 		if err := requests.URL(DailyUrl).
 			UserAgent("curl/8.0.1").
 			ToString(&data).
 			Fetch(ctx); err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 			return
 		}
 
 		var currRate CurrRate
 		if err := util.FromXml(data, &currRate); err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 			return
 		}
 		var id int
 		if err := db.GetPool().QueryRow(ctx, insCurrencyRateQuery, currRate.Date, currRate.Name).Scan(&id); err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 			return
 		}
 		for _, it := range currRate.RateItems {
 			if _, err := db.GetPool().Exec(ctx, insCurrencyRateItemQuery,
 				it.CurID, id, it.NumCode, it.CharCode, it.Nominal, it.Name, it.Value); err != nil {
-				log.Print(err)
+				slog.Warn(err.Error())
 			}
 		}
 	}

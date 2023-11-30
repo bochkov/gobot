@@ -2,7 +2,7 @@ package util
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"net/http"
 )
 
@@ -35,7 +35,7 @@ func AsJson(w http.ResponseWriter, status int, model any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if _, err = w.Write(js); err != nil {
-		log.Println(err)
+		slog.Warn(err.Error())
 		return
 	}
 }

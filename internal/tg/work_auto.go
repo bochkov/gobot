@@ -3,11 +3,11 @@ package tg
 import (
 	"context"
 	"fmt"
-	"log"
 	"regexp"
 	"strings"
 
 	"github.com/bochkov/gobot/internal/autonumbers"
+	"log/slog"
 )
 
 type AutoWorker struct {
@@ -37,7 +37,7 @@ func (a *AutoWorker) Answer(msg *Message) []Method {
 		name := msg.Text[strings.Index(msg.Text, " ")+1:]
 		regions, err := a.Service.FindRegionByName(ctx, name)
 		if err != nil {
-			log.Print(err)
+			slog.Warn(err.Error())
 		} else {
 			return a.createMessages(msg.Chat.Id, regions)
 		}
@@ -46,7 +46,7 @@ func (a *AutoWorker) Answer(msg *Message) []Method {
 		for _, digits := range matches {
 			region, err := a.Service.FindRegionByCode(ctx, digits[1])
 			if err != nil {
-				log.Print(err)
+				slog.Warn(err.Error())
 			} else {
 				regions = append(regions, *region)
 			}

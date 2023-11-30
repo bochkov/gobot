@@ -2,9 +2,8 @@ package cbr
 
 import (
 	"context"
-	"log"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+	"log/slog"
 )
 
 type repository struct {
@@ -36,7 +35,7 @@ func (r *repository) FindRateRecordsByRateId(ctx context.Context, rateId int) ([
 	for rows.Next() {
 		var ri RateItem
 		if err := rows.Scan(&ri.Id, &ri.CurID, &ri.NumCode, &ri.CharCode, &ri.Nominal, &ri.Name, &ri.Value); err != nil {
-			log.Fatal(err)
+			slog.Warn(err.Error())
 		}
 		items = append(items, ri)
 	}
@@ -52,7 +51,7 @@ func (r *repository) LatestRate(ctx context.Context) (*CurrRate, error) {
 
 	var cr CurrRate
 	if err := row.Scan(&cr.Id, &cr.Date, &cr.FetchDate, &cr.Name); err != nil {
-		log.Fatal(err)
+		slog.Warn(err.Error())
 		return nil, err
 	}
 

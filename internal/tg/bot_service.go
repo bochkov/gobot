@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
+	"log/slog"
 )
 
 type service struct {
@@ -25,7 +25,7 @@ func NewService(workers ...Worker) Service {
 func (s *service) GetAnswers(msg *Message) []Method {
 	for _, serv := range s.workers {
 		if serv.IsMatch(msg.Text) {
-			log.Printf("choosed = %s", serv.Description())
+			slog.Info(fmt.Sprintf("choosed = %s", serv.Description()))
 			return serv.Answer(msg)
 		}
 	}
@@ -34,7 +34,7 @@ func (s *service) GetAnswers(msg *Message) []Method {
 
 func (s *service) Execute(method Method, token string) (*TypedResult[any], error) {
 	methodName, methodResponse := method.Describe()
-	log.Printf("request : method='%s', body=%+v", methodName, util.ToJson(method))
+	slog.Info("request", "method", methodName, "body", util.ToJson(method))
 	res := &TypedResult[any]{
 		Result: methodResponse,
 	}
@@ -60,17 +60,17 @@ func (s *service) Execute(method Method, token string) (*TypedResult[any], error
 
 func (s *service) Push(text string) {
 	if text == "" {
-		log.Print("empty text")
+		slog.Warn("empty text")
 		return
 	}
 	token := db.GetProp(db.TgBotTokenKey, "")
 	if token == "" {
-		log.Print("no token specified")
+		slog.Warn("no token specified")
 		return
 	}
 	chatId := db.GetProp(db.ChatAutoSend, "") // TODO
 	if chatId == "" {
-		log.Print("no chat.id specified")
+		slog.Warn("no chat.id specified")
 		return
 	}
 	for _, chat := range strings.Split(chatId, ";") {
@@ -80,7 +80,7 @@ func (s *service) Push(text string) {
 		sm.SendOptions.DisableWebPagePreview = true
 		sm.SendOptions.DisableNotification = true
 		if _, exec := s.Execute(sm, token); exec != nil {
-			log.Print(exec)
+			slog.Warn(exec.Error())
 		}
 	}
 }
