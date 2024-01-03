@@ -29,11 +29,19 @@ const (
 	MARKDOWN   ParseMode = "Markdown"
 )
 
+type LinkPreviewOptions struct {
+	Disabled      bool   `json:"is_disabled,omitempty"`
+	Url           string `json:"url,omitempty"`
+	PreferSmall   bool   `json:"prefer_small_media,omitempty"`
+	PreferLarge   bool   `json:"prefer_large_media,omitempty"`
+	ShowAboveText bool   `json:"show_above_text,omitempty"`
+}
+
 type SendOptions struct {
-	MessageThreadId       string    `json:"message_thread_id,omitempty"`
-	ParseMode             ParseMode `json:"parse_mode,omitempty"`
-	DisableWebPagePreview bool      `json:"disable_web_page_preview,omitempty"`
-	DisableNotification   bool      `json:"disable_notification,omitempty"`
+	MessageThreadId     string             `json:"message_thread_id,omitempty"`
+	ParseMode           ParseMode          `json:"parse_mode,omitempty"`
+	LinkPreviewOpts     LinkPreviewOptions `json:"link_preview_options,omitempty"`
+	DisableNotification bool               `json:"disable_notification,omitempty"`
 }
 
 type InputFile struct {

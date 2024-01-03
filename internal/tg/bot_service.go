@@ -8,10 +8,11 @@ import (
 	"reflect"
 	"strings"
 
+	"log/slog"
+
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
-	"log/slog"
 )
 
 type service struct {
@@ -77,7 +78,7 @@ func (s *service) Push(text string) {
 		sm := new(SendMessage[string])
 		sm.ChatId = chat
 		sm.Text = text
-		sm.SendOptions.DisableWebPagePreview = true
+		sm.SendOptions.LinkPreviewOpts.Disabled = true
 		sm.SendOptions.DisableNotification = true
 		if _, exec := s.Execute(sm, token); exec != nil {
 			slog.Warn(exec.Error())
