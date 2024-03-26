@@ -78,6 +78,7 @@ func main() {
 		tg.NewQuoteWorker(sQuotes),
 		tg.NewCbrWorker(sCbr),
 		tg.NewRutorWorker(sTorrent),
+		tg.NewWikiWorker(sWikiToday),
 	)
 
 	/// scheduler
