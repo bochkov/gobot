@@ -47,7 +47,11 @@ func (t *today) Today() (*ThisDay, error) {
 	}
 
 	var res ThisDay
-	res.Date = htmlquery.InnerText(date)
+	res.Date = strings.ReplaceAll(
+		htmlquery.OutputHTML(date, true),
+		"/wiki",
+		"https://ru.wikipedia.org/wiki",
+	)
 	res.ImgSrc = strings.ReplaceAll(
 		htmlquery.SelectAttr(img, "href"),
 		"/wiki",
