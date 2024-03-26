@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"log/slog"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type Handler struct {

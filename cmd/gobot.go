@@ -17,6 +17,7 @@ import (
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/lib/router"
 	"github.com/bochkov/gobot/internal/lib/tasks"
+	"github.com/bochkov/gobot/internal/push"
 	"github.com/bochkov/gobot/internal/quote"
 	"github.com/bochkov/gobot/internal/rutor"
 	"github.com/bochkov/gobot/internal/tg"
@@ -84,7 +85,7 @@ func main() {
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
 	tasks.Schedule(scheduler, sTelegram, sWikiToday, tasks.SchedParam{
-		Desc: "wiki today", CronProp: db.AnekdotScheduler, CronDef: "0 6 * * *",
+		Desc: "wiki today", CronProp: db.WikiScheduler, CronDef: "0 6 * * *",
 	})
 	sCbrTasks.Schedule(scheduler)
 	scheduler.StartAsync()
@@ -97,6 +98,7 @@ func main() {
 		Quotes:   quote.NewHandler(sQuotes),
 		Wiki:     wiki.NewHandler(sWikiToday),
 		Telegram: tg.NewHandler(sTelegram),
+		Dev:      push.NewHandler(sTelegram, sWikiToday),
 	}
 	routes := router.ConfigureRouter(handlers)
 	srv := &http.Server{Addr: flags.ServeAddr(), Handler: routes}

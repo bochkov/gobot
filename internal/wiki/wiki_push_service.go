@@ -1,6 +1,8 @@
 package wiki
 
-import "log/slog"
+import (
+	"log/slog"
+)
 
 func (b *today) PushText() string {
 	txt, err := b.Today()
@@ -8,5 +10,5 @@ func (b *today) PushText() string {
 		slog.Warn("push wiki today", "err", err)
 		return ""
 	}
-	return txt
+	return txt.AsHtml()
 }

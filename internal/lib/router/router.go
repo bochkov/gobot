@@ -6,6 +6,7 @@ import (
 	"github.com/bochkov/gobot/internal/anekdot"
 	"github.com/bochkov/gobot/internal/autonumbers"
 	"github.com/bochkov/gobot/internal/cbr"
+	"github.com/bochkov/gobot/internal/push"
 	"github.com/bochkov/gobot/internal/quote"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/wiki"
@@ -22,6 +23,7 @@ type Handlers struct {
 	Quotes   *quote.Handler
 	Wiki     *wiki.Handler
 	Telegram *tg.Handler
+	Dev      *push.DevHandler
 }
 
 func ConfigureRouter(h *Handlers) *chi.Mux {
@@ -45,6 +47,8 @@ func ConfigureRouter(h *Handlers) *chi.Mux {
 	r.Get("/cbr/{period:month|year}/{currency}", h.Cbr.PeriodRates)
 
 	r.Get("/today", h.Wiki.WikiHandler)
+
+	// r.Get("/bot/push", h.Dev.DevHandler)
 
 	return r
 }

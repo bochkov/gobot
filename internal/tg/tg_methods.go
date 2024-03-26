@@ -59,6 +59,17 @@ func (sm *SendMessage[T]) Describe() (string, any) {
 	return "sendMessage", &Message{}
 }
 
+type SendPhoto[T IntOrString] struct {
+	ChatId T      `json:"chat_id,string"`
+	Photo  string `json:"photo"`
+	Text   string `json:"caption"`
+	SendOptions
+}
+
+func (sm *SendPhoto[T]) Describe() (string, any) {
+	return "sendPhoto", &Message{}
+}
+
 type SendDocument[T IntOrString] struct {
 	ChatId                      T         `json:"chat_id,string"`
 	InputFile                   InputFile `json:"-"`

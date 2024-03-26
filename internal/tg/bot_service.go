@@ -78,8 +78,8 @@ func (s *service) Push(text string) {
 		sm := new(SendMessage[string])
 		sm.ChatId = chat
 		sm.Text = text
-		sm.SendOptions.LinkPreviewOpts.Disabled = true
 		sm.SendOptions.DisableNotification = true
+		sm.SendOptions.ParseMode = HTML
 		if _, exec := s.Execute(sm, token); exec != nil {
 			slog.Warn(exec.Error())
 		}

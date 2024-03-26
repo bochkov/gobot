@@ -28,7 +28,7 @@ func (w *WikiWorker) Answer(msg *Message) []Method {
 	if err != nil {
 		sm.Text = "не получилось ("
 	}
-	sm.Text = today
+	sm.Text = today.AsHtml()
 	sm.SendOptions = SendOptions{ParseMode: HTML}
 	return []Method{&sm}
 }

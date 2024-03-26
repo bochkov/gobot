@@ -9,6 +9,7 @@ const (
 	ChatAutoSend     string = "chat.auto.send"
 	ChatIdKey        string = "chat.id"
 	AnekdotScheduler string = "schedule.anekdot"
+	WikiScheduler    string = "schedule.wiki"
 )
 
 func GetProp(key string, def string) string {
