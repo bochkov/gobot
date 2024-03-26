@@ -19,7 +19,7 @@ func (w *WikiWorker) Description() string {
 }
 
 func (w *WikiWorker) IsMatch(text string) bool {
-	return strings.Contains(strings.ToLower(text), "цитат")
+	return strings.Contains(strings.ToLower(text), "today")
 }
 
 func (w *WikiWorker) Answer(msg *Message) []Method {
