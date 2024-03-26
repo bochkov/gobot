@@ -8,6 +8,7 @@ import (
 	"github.com/bochkov/gobot/internal/cbr"
 	"github.com/bochkov/gobot/internal/quote"
 	"github.com/bochkov/gobot/internal/tg"
+	"github.com/bochkov/gobot/internal/wiki"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -19,6 +20,7 @@ type Handlers struct {
 	Auto     *autonumbers.Handler
 	Cbr      *cbr.Handler
 	Quotes   *quote.Handler
+	Wiki     *wiki.Handler
 	Telegram *tg.Handler
 }
 
@@ -41,6 +43,8 @@ func ConfigureRouter(h *Handlers) *chi.Mux {
 	r.Get("/cbr/latest/all", h.Cbr.LatestRate)
 	r.Get("/cbr/latest", h.Cbr.LatestRates)
 	r.Get("/cbr/{period:month|year}/{currency}", h.Cbr.PeriodRates)
+
+	r.Get("/today", h.Wiki.WikiHandler)
 
 	return r
 }

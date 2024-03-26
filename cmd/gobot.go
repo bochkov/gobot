@@ -21,6 +21,7 @@ import (
 	"github.com/bochkov/gobot/internal/rutor"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/util"
+	"github.com/bochkov/gobot/internal/wiki"
 
 	"github.com/go-co-op/gocron"
 	"github.com/lmittmann/tint"
@@ -58,6 +59,7 @@ func main() {
 	}
 
 	/// services
+	sWikiToday := wiki.NewService()
 	sAnekdot := anekdot.NewService()
 	sQuotes := quote.NewService()
 	sTorrent := rutor.NewService()
@@ -80,8 +82,8 @@ func main() {
 
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
-	tasks.Schedule(scheduler, sTelegram, sAnekdot, tasks.SchedParam{
-		Desc: "anekdot", CronProp: db.AnekdotScheduler, CronDef: "0 4 * * *",
+	tasks.Schedule(scheduler, sTelegram, sWikiToday, tasks.SchedParam{
+		Desc: "wiki today", CronProp: db.AnekdotScheduler, CronDef: "0 6 * * *",
 	})
 	sCbrTasks.Schedule(scheduler)
 	scheduler.StartAsync()
@@ -92,6 +94,7 @@ func main() {
 		Auto:     autonumbers.NewHandler(sAutonumbers),
 		Cbr:      cbr.NewHandler(sCbr),
 		Quotes:   quote.NewHandler(sQuotes),
+		Wiki:     wiki.NewHandler(sWikiToday),
 		Telegram: tg.NewHandler(sTelegram),
 	}
 	routes := router.ConfigureRouter(handlers)
