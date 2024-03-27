@@ -48,7 +48,7 @@ func ConfigureRouter(h *Handlers) *chi.Mux {
 
 	r.Get("/today", h.Wiki.WikiHandler)
 
-	// r.Get("/bot/push", h.Dev.DevHandler)
+	r.Get("/bot/push", h.Dev.DevHandler)
 
 	return r
 }

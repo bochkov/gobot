@@ -20,6 +20,14 @@ func (t *today) Description() string {
 	return "В этот день"
 }
 
+func (t *today) normalizeUrls(source string) string {
+	html := strings.ReplaceAll(
+		source, "/wiki", "https://ru.wikipedia.org/wiki",
+	)
+	var re = regexp.MustCompile(`title=".*?"`)
+	return re.ReplaceAllString(html, "")
+}
+
 func (t *today) Today() (*ThisDay, error) {
 	doc, err := htmlquery.LoadURL(WikiUrl)
 	if err != nil {
@@ -31,9 +39,22 @@ func (t *today) Today() (*ThisDay, error) {
 		return nil, err
 	}
 
+	var res ThisDay
+
 	date, err := htmlquery.Query(todayNode, "//h2/span[2]/div[2]/a")
 	if err != nil {
 		return nil, err
+	}
+	res.Date = t.normalizeUrls(htmlquery.OutputHTML(date, true))
+
+	worldDay, err := htmlquery.Query(todayNode, "//p/a")
+	if err == nil {
+		res.WorldDay = t.normalizeUrls(htmlquery.OutputHTML(worldDay, true))
+	}
+
+	img, err := htmlquery.Query(todayNode, "//figure/a")
+	if err == nil {
+		res.ImgSrc = t.normalizeUrls(htmlquery.SelectAttr(img, "href"))
 	}
 
 	list, err := htmlquery.QueryAll(todayNode, "//ul/li")
@@ -41,34 +62,10 @@ func (t *today) Today() (*ThisDay, error) {
 		return nil, err
 	}
 
-	img, err := htmlquery.Query(todayNode, "//figure/a")
-	if err != nil {
-		return nil, err
-	}
-
-	var res ThisDay
-	res.Date = strings.ReplaceAll(
-		htmlquery.OutputHTML(date, true),
-		"/wiki",
-		"https://ru.wikipedia.org/wiki",
-	)
-	res.ImgSrc = strings.ReplaceAll(
-		htmlquery.SelectAttr(img, "href"),
-		"/wiki",
-		"https://ru.wikipedia.org/wiki",
-	)
-
 	var sb strings.Builder
 	for _, n := range list {
 		sb.WriteString("\n")
-		html := strings.ReplaceAll(
-			htmlquery.OutputHTML(n, false),
-			"/wiki",
-			"https://ru.wikipedia.org/wiki",
-		)
-		var re = regexp.MustCompile(`title=".*?"`)
-		html = re.ReplaceAllString(html, "")
-		sb.WriteString(html)
+		sb.WriteString(t.normalizeUrls(htmlquery.OutputHTML(n, false)))
 	}
 	res.Text = sb.String()
 
