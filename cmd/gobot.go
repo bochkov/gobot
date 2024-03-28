@@ -100,7 +100,7 @@ func main() {
 		Telegram: tg.NewHandler(sTelegram),
 		Dev:      push.NewHandler(sTelegram, sWikiToday),
 	}
-	routes := router.ConfigureRouter(handlers)
+	routes := router.ConfigureRouter(handlers, flags.InvokeForTesting())
 	srv := &http.Server{Addr: flags.ServeAddr(), Handler: routes}
 
 	// start

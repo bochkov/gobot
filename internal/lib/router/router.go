@@ -26,7 +26,7 @@ type Handlers struct {
 	Dev      *push.DevHandler
 }
 
-func ConfigureRouter(h *Handlers) *chi.Mux {
+func ConfigureRouter(h *Handlers, dev bool) *chi.Mux {
 	r = chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -48,7 +48,9 @@ func ConfigureRouter(h *Handlers) *chi.Mux {
 
 	r.Get("/today", h.Wiki.WikiHandler)
 
-	r.Get("/bot/push", h.Dev.DevHandler)
+	if dev {
+		r.Get("/bot/push", h.Dev.DevHandler)
+	}
 
 	return r
 }

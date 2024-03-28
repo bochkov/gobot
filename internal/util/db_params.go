@@ -15,6 +15,7 @@ type Flags struct {
 	dbUser   string
 	dbPasswd string
 	port     int
+	dev      bool
 }
 
 func (f *Flags) DbConnectString() string {
@@ -28,6 +29,10 @@ func (f *Flags) ServeAddr() string {
 
 func (f *Flags) Port() int {
 	return f.port
+}
+
+func (f *Flags) InvokeForTesting() bool {
+	return f.dev
 }
 
 func (f *Flags) isOk() bool {
@@ -44,6 +49,7 @@ func obtainFromFlag(f *Flags) {
 	flag.StringVar(&f.dbUser, "dbuser", "", "database user login")
 	flag.StringVar(&f.dbPasswd, "dbpassword", "", "database user password")
 	flag.IntVar(&f.port, "port", 5000, "server port")
+	flag.BoolVar(&f.dev, "dev", false, "enable dev endpoints")
 	flag.Parse()
 }
 
