@@ -47,13 +47,13 @@ func (t *today) Today() (*ThisDay, error) {
 	}
 	res.Date = t.normalizeUrls(htmlquery.OutputHTML(date, true))
 
-	worldDay, err := htmlquery.Query(todayNode, "//p/a")
-	if err == nil {
+	worldDay, _ := htmlquery.Query(todayNode, "//p/a")
+	if worldDay != nil {
 		res.WorldDay = t.normalizeUrls(htmlquery.OutputHTML(worldDay, true))
 	}
 
-	img, err := htmlquery.Query(todayNode, "//figure/a")
-	if err == nil {
+	img, _ := htmlquery.Query(todayNode, "//figure/a")
+	if img != nil {
 		res.ImgSrc = t.normalizeUrls(htmlquery.SelectAttr(img, "href"))
 	}
 
