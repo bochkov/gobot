@@ -1,31 +1,34 @@
 package wiki
 
 import (
-	"regexp"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 const WikiUrl string = "https://ru.wikipedia.org/wiki/%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0"
 
 type today struct {
+	sanitizer *bluemonday.Policy
 }
 
 func NewService() Service {
-	return &today{}
+	p := bluemonday.NewPolicy()
+	p.AllowElements("b", "strong", "i", "em")
+	p.AllowAttrs("href").OnElements("a")
+	return &today{sanitizer: p}
 }
 
 func (t *today) Description() string {
 	return "В этот день"
 }
 
-func (t *today) normalizeUrls(source string) string {
+func (t *today) sanitizeHtml(source string) string {
 	html := strings.ReplaceAll(
 		source, "/wiki", "https://ru.wikipedia.org/wiki",
 	)
-	var re = regexp.MustCompile(`title=".*?"`)
-	return re.ReplaceAllString(html, "")
+	return t.sanitizer.Sanitize(html)
 }
 
 func (t *today) Today() (*ThisDay, error) {
@@ -45,16 +48,16 @@ func (t *today) Today() (*ThisDay, error) {
 	if err != nil {
 		return nil, err
 	}
-	res.Date = t.normalizeUrls(htmlquery.OutputHTML(date, true))
+	res.Date = t.sanitizeHtml(htmlquery.OutputHTML(date, true))
 
 	worldDay, _ := htmlquery.Query(todayNode, "//p/a")
 	if worldDay != nil {
-		res.WorldDay = t.normalizeUrls(htmlquery.OutputHTML(worldDay, true))
+		res.WorldDay = t.sanitizeHtml(htmlquery.OutputHTML(worldDay, true))
 	}
 
 	img, _ := htmlquery.Query(todayNode, "//figure/a")
 	if img != nil {
-		res.ImgSrc = t.normalizeUrls(htmlquery.SelectAttr(img, "href"))
+		res.ImgSrc = t.sanitizeHtml(htmlquery.SelectAttr(img, "href"))
 	}
 
 	list, err := htmlquery.QueryAll(todayNode, "//ul/li")
@@ -65,7 +68,7 @@ func (t *today) Today() (*ThisDay, error) {
 	var sb strings.Builder
 	for _, n := range list {
 		sb.WriteString("\n")
-		sb.WriteString(t.normalizeUrls(htmlquery.OutputHTML(n, false)))
+		sb.WriteString(t.sanitizeHtml(htmlquery.OutputHTML(n, false)))
 	}
 	res.Text = sb.String()
 
