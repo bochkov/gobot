@@ -50,7 +50,7 @@ func (t *today) Today() (*ThisDay, error) {
 	}
 	res.Date = t.sanitizeHtml(htmlquery.OutputHTML(date, true))
 
-	worldDay, _ := htmlquery.Query(todayNode, "//p/a")
+	worldDay, _ := htmlquery.Query(todayNode, "//p")
 	if worldDay != nil {
 		res.WorldDay = t.sanitizeHtml(htmlquery.OutputHTML(worldDay, true))
 	}

@@ -29,7 +29,7 @@ func (t *ThisDay) AsHtml() string {
 	}
 	sb.WriteString(fmt.Sprintf("<b>%s</b>\n", t.Date))
 	if t.WorldDay != "" {
-		sb.WriteString(fmt.Sprintf("%s\n", t.WorldDay))
+		sb.WriteString(t.WorldDay)
 	}
 	sb.WriteString(t.Text)
 
