@@ -24,21 +24,27 @@ func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
 	if err := json.NewDecoder(req.Body).Decode(&upd); err != nil {
 		return
 	}
+	slog.Debug(fmt.Sprintf("%+v", upd.InlineQuery))
 	slog.Debug(fmt.Sprintf("%+v", upd.Message))
 	token := chi.URLParam(req, "token")
-	if h.shouldAnswer(upd.Message) {
-		go h.sendAnswer(token, upd.Message)
+
+	iq := upd.InlineQuery
+	if iq != nil {
+		go h.sendAnswer(token, iq.User.Id, iq.Query)
+	}
+	msg := upd.Message
+	if msg != nil && h.shouldAnswer(msg) {
+		go h.sendAnswer(token, msg.Chat.Id, msg.Text)
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) shouldAnswer(msg *Message) bool {
-	return msg != nil &&
-		(strings.HasPrefix(msg.Text, "@resnyx") || strings.HasPrefix(msg.Text, "/"))
+	return strings.HasPrefix(msg.Text, "@resnyx") || strings.HasPrefix(msg.Text, "/")
 }
 
-func (h *Handler) sendAnswer(token string, msg *Message) {
-	methods := h.Service.GetAnswers(msg)
+func (h *Handler) sendAnswer(token string, chatId int64, txt string) {
+	methods := h.Service.GetAnswers(chatId, txt)
 	for _, method := range methods {
 		res, err := h.Service.Execute(method, token)
 		if err != nil {

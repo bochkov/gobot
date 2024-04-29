@@ -23,11 +23,11 @@ func NewService(workers ...Worker) Service {
 	return &service{workers: workers}
 }
 
-func (s *service) GetAnswers(msg *Message) []Method {
+func (s *service) GetAnswers(chatId int64, txt string) []Method {
 	for _, serv := range s.workers {
-		if serv.IsMatch(msg.Text) {
+		if serv.IsMatch(txt) {
 			slog.Info(fmt.Sprintf("choosed = %s", serv.Description()))
-			return serv.Answer(msg)
+			return serv.Answer(chatId, txt)
 		}
 	}
 	return nil

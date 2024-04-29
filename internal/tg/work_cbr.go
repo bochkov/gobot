@@ -25,8 +25,8 @@ func (c *CbrWorker) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "курс")
 }
 
-func (c *CbrWorker) Answer(msg *Message) []Method {
-	text := strings.ToUpper(msg.Text)
+func (c *CbrWorker) Answer(chatId int64, txt string) []Method {
+	text := strings.ToUpper(txt)
 	currencies := regexp.MustCompile(`\s+`).Split(text, -1)[1:]
 	if len(currencies) == 0 {
 		currencies = append(currencies, "USD")
@@ -36,14 +36,14 @@ func (c *CbrWorker) Answer(msg *Message) []Method {
 	ranges := c.Service.LatestRange(context.Background(), currencies)
 	if len(ranges) != 0 {
 		sm := SendMessage[int64]{
-			ChatId: msg.Chat.Id,
+			ChatId: chatId,
 			Text:   fmt.Sprintf("Курс на %s", ranges[0].Value.Date.Time.Format("02.01.2006")),
 		}
 		methods = append(methods, &sm)
 	}
 	for _, r := range ranges {
 		sm := SendMessage[int64]{
-			ChatId: msg.Chat.Id,
+			ChatId: chatId,
 			Text:   r.String(),
 		}
 		methods = append(methods, &sm)

@@ -1,7 +1,17 @@
 package tg
 
+type InlineQuery struct {
+	Id       string    `json:"id"`
+	User     *User     `json:"from"`
+	Query    string    `json:"query"`
+	Offset   string    `json:"offset"`
+	ChatType string    `json:"chat_type"`
+	Location *Location `json:"location"`
+}
+
 type Update struct {
-	Message *Message `json:"message"`
+	Message     *Message     `json:"message"`
+	InlineQuery *InlineQuery `json:"inline_query"`
 }
 
 type User struct {
@@ -48,4 +58,9 @@ type TypedResult[result any] struct {
 	Result      result `json:"result"`
 	ErrorCode   int    `json:"error_code"`
 	Description string `json:"description"`
+}
+
+type Location struct {
+	Lat float32 `json:"latitude"`
+	Lon float32 `json:"longitude"`
 }

@@ -6,8 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bochkov/gobot/internal/autonumbers"
 	"log/slog"
+
+	"github.com/bochkov/gobot/internal/autonumbers"
 )
 
 type AutoWorker struct {
@@ -29,17 +30,17 @@ func (a *AutoWorker) IsMatch(text string) bool {
 		strings.Contains(match, "авто")
 }
 
-func (a *AutoWorker) Answer(msg *Message) []Method {
+func (a *AutoWorker) Answer(chatId int64, txt string) []Method {
 	ctx := context.Background()
 	re := regexp.MustCompile(`(?P<code>\d+)`)
-	matches := re.FindAllStringSubmatch(msg.Text, -1)
+	matches := re.FindAllStringSubmatch(txt, -1)
 	if len(matches) == 0 {
-		name := msg.Text[strings.Index(msg.Text, " ")+1:]
+		name := txt[strings.Index(txt, " ")+1:]
 		regions, err := a.Service.FindRegionByName(ctx, name)
 		if err != nil {
 			slog.Warn(err.Error())
 		} else {
-			return a.createMessages(msg.Chat.Id, regions)
+			return a.createMessages(chatId, regions)
 		}
 	} else {
 		regions := make([]autonumbers.Region, 0)
@@ -51,9 +52,9 @@ func (a *AutoWorker) Answer(msg *Message) []Method {
 				regions = append(regions, *region)
 			}
 		}
-		return a.createMessages(msg.Chat.Id, regions)
+		return a.createMessages(chatId, regions)
 	}
-	return a.createMessages(msg.Chat.Id, []autonumbers.Region{})
+	return a.createMessages(chatId, []autonumbers.Region{})
 }
 
 func (a *AutoWorker) createMessages(chatId int64, regions []autonumbers.Region) []Method {

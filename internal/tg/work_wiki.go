@@ -22,9 +22,9 @@ func (w *WikiWorker) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "today")
 }
 
-func (w *WikiWorker) Answer(msg *Message) []Method {
+func (w *WikiWorker) Answer(chatId int64, txt string) []Method {
 	today, err := wiki.NewService().Today()
-	sm := SendMessage[int64]{ChatId: msg.Chat.Id}
+	sm := SendMessage[int64]{ChatId: chatId}
 	if err != nil {
 		sm.Text = "не получилось ("
 	}

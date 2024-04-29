@@ -22,9 +22,9 @@ func (q *QuoteWorker) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "цитат")
 }
 
-func (q *QuoteWorker) Answer(msg *Message) []Method {
+func (q *QuoteWorker) Answer(chatId int64, txt string) []Method {
 	cite, err := quote.NewService().RandomQuote()
-	sm := SendMessage[int64]{ChatId: msg.Chat.Id}
+	sm := SendMessage[int64]{ChatId: chatId}
 	if err != nil {
 		sm.Text = "не получилось ("
 	}

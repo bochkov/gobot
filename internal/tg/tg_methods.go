@@ -38,10 +38,10 @@ type LinkPreviewOptions struct {
 }
 
 type SendOptions struct {
-	MessageThreadId     string             `json:"message_thread_id,omitempty"`
-	ParseMode           ParseMode          `json:"parse_mode,omitempty"`
-	LinkPreviewOpts     LinkPreviewOptions `json:"link_preview_options,omitempty"`
-	DisableNotification bool               `json:"disable_notification,omitempty"`
+	MessageThreadId     string              `json:"message_thread_id,omitempty"`
+	ParseMode           ParseMode           `json:"parse_mode,omitempty"`
+	LinkPreviewOpts     *LinkPreviewOptions `json:"link_preview_options,omitempty"`
+	DisableNotification bool                `json:"disable_notification,omitempty"`
 }
 
 type InputFile struct {
@@ -49,10 +49,20 @@ type InputFile struct {
 	filename string
 }
 
+type InlineKbButton struct {
+	Text     string `json:"text"`
+	Callback string `json:"callback_data,omitempty"`
+}
+
+type InlineKeyboardMarkup struct {
+	Keyboard [][]InlineKbButton `json:"inline_keyboard"`
+}
+
 type SendMessage[T IntOrString] struct {
 	ChatId T      `json:"chat_id"`
 	Text   string `json:"text"`
 	SendOptions
+	InlineMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
 func (sm *SendMessage[T]) Describe() (string, any) {

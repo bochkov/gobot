@@ -23,8 +23,8 @@ func (a *AnekdotWorker) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "анек")
 }
 
-func (a *AnekdotWorker) Answer(msg *Message) []Method {
-	sm := SendMessage[int64]{ChatId: msg.Chat.Id}
+func (a *AnekdotWorker) Answer(chatId int64, txt string) []Method {
+	sm := SendMessage[int64]{ChatId: chatId}
 	anek, err := a.Service.GetRandom()
 	if err != nil {
 		log.Print(err)

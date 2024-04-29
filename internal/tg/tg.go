@@ -7,11 +7,11 @@ type MethodCustomize func(message *SendMessage[string])
 type Worker interface {
 	Description() string
 	IsMatch(text string) bool
-	Answer(msg *Message) []Method
+	Answer(chatId int64, txt string) []Method
 }
 
 type Service interface {
 	push.Service
 	Execute(method Method, token string) (*TypedResult[any], error)
-	GetAnswers(msg *Message) []Method
+	GetAnswers(chatId int64, txt string) []Method
 }

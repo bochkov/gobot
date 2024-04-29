@@ -23,13 +23,13 @@ func (r *RutorWorker) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "rutor")
 }
 
-func (r *RutorWorker) Answer(msg *Message) []Method {
+func (r *RutorWorker) Answer(chatId int64, txt string) []Method {
 	re := regexp.MustCompile(`https?://\S+`)
-	matches := re.FindStringSubmatch(msg.Text)
+	matches := re.FindStringSubmatch(txt)
 	if len(matches) == 0 {
 		return []Method{
 			&SendMessage[int64]{
-				ChatId: msg.Chat.Id,
+				ChatId: chatId,
 				Text:   "не смог выделить URL",
 			},
 		}
@@ -39,18 +39,18 @@ func (r *RutorWorker) Answer(msg *Message) []Method {
 	if err != nil {
 		return []Method{
 			&SendMessage[int64]{
-				ChatId: msg.Chat.Id,
+				ChatId: chatId,
 				Text:   err.Error(),
 			},
 		}
 	}
 	return []Method{
 		&SendMessage[int64]{
-			ChatId: msg.Chat.Id,
+			ChatId: chatId,
 			Text:   torrent.MagnetUrl,
 		},
 		&SendDocument[int64]{
-			ChatId:                      msg.Chat.Id,
+			ChatId:                      chatId,
 			InputFile:                   InputFile{bytes: torrent.Bytes, filename: torrent.Name},
 			Caption:                     torrent.Name,
 			DisableContentTypeDetection: true,
