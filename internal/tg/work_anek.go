@@ -20,7 +20,7 @@ func (a *AnekdotWorker) Description() string {
 }
 
 func (a *AnekdotWorker) IsMatch(text string) bool {
-	return strings.Contains(strings.ToLower(text), "анек")
+	return strings.Contains(strings.ToLower(text), "анек") || strings.Contains(strings.ToLower(text), "joke")
 }
 
 func (a *AnekdotWorker) Answer(chatId int64, txt string) []Method {

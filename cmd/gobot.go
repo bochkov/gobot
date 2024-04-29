@@ -74,7 +74,6 @@ func main() {
 		cbr.NewTaskRepo(dbcp),
 	)
 	sTelegram := tg.NewService(
-		tg.NewTgWorker(),
 		tg.NewAnekdotWorker(sAnekdot),
 		tg.NewAutoWorker(sAutonumbers),
 		tg.NewQuoteWorker(sQuotes),

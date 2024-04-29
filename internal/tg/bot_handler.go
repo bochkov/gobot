@@ -26,10 +26,6 @@ func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	token := chi.URLParam(req, "token")
 
-	iq := upd.CallbackQuery
-	if iq != nil {
-		go h.sendAnswer(token, iq.User.Id, iq.Data)
-	}
 	msg := upd.Message
 	if msg != nil && h.shouldAnswer(msg) {
 		go h.sendAnswer(token, msg.Chat.Id, msg.Text)

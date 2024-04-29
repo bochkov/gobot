@@ -19,7 +19,7 @@ func (q *QuoteWorker) Description() string {
 }
 
 func (q *QuoteWorker) IsMatch(text string) bool {
-	return strings.Contains(strings.ToLower(text), "цитат")
+	return strings.Contains(strings.ToLower(text), "цитат") || strings.Contains(strings.ToLower(text), "quote")
 }
 
 func (q *QuoteWorker) Answer(chatId int64, txt string) []Method {

@@ -22,7 +22,7 @@ func (c *CbrWorker) Description() string {
 }
 
 func (c *CbrWorker) IsMatch(text string) bool {
-	return strings.Contains(strings.ToLower(text), "курс")
+	return strings.Contains(strings.ToLower(text), "курс") || strings.Contains(strings.ToLower(text), "exchange")
 }
 
 func (c *CbrWorker) Answer(chatId int64, txt string) []Method {
