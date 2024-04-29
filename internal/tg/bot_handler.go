@@ -2,7 +2,6 @@ package tg
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
@@ -21,9 +20,6 @@ func NewHandler(s Service) *Handler {
 }
 
 func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
-	body, _ := io.ReadAll(req.Body)
-	slog.Debug(string(body))
-
 	var upd Update
 	if err := json.NewDecoder(req.Body).Decode(&upd); err != nil {
 		return
