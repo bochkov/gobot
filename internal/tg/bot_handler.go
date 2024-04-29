@@ -2,6 +2,7 @@ package tg
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 
@@ -20,17 +21,18 @@ func NewHandler(s Service) *Handler {
 }
 
 func (h *Handler) BotHandler(w http.ResponseWriter, req *http.Request) {
+	body, _ := io.ReadAll(req.Body)
+	slog.Debug(string(body))
+
 	var upd Update
 	if err := json.NewDecoder(req.Body).Decode(&upd); err != nil {
 		return
 	}
-	slog.Debug(fmt.Sprintf("%+v", upd.InlineQuery))
-	slog.Debug(fmt.Sprintf("%+v", upd.Message))
 	token := chi.URLParam(req, "token")
 
-	iq := upd.InlineQuery
+	iq := upd.CallbackQuery
 	if iq != nil {
-		go h.sendAnswer(token, iq.User.Id, iq.Query)
+		go h.sendAnswer(token, iq.User.Id, iq.Data)
 	}
 	msg := upd.Message
 	if msg != nil && h.shouldAnswer(msg) {

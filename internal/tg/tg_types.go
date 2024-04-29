@@ -1,17 +1,14 @@
 package tg
 
-type InlineQuery struct {
-	Id       string    `json:"id"`
-	User     *User     `json:"from"`
-	Query    string    `json:"query"`
-	Offset   string    `json:"offset"`
-	ChatType string    `json:"chat_type"`
-	Location *Location `json:"location"`
+type CallbackQuery struct {
+	Id   string `json:"id"`
+	User *User  `json:"from"`
+	Data string `json:"data"`
 }
 
 type Update struct {
-	Message     *Message     `json:"message"`
-	InlineQuery *InlineQuery `json:"inline_query"`
+	Message       *Message       `json:"message"`
+	CallbackQuery *CallbackQuery `json:"callback_query"`
 }
 
 type User struct {
