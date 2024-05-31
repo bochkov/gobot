@@ -84,8 +84,6 @@ insert into code (val, region_id) values ('193', 23);
 
 insert into region (id, name) values (24, 'Красноярский край');
 insert into code (val, region_id) values ('24', 24);
-insert into code (val, region_id) values ('84', 24);
-insert into code (val, region_id) values ('88', 24);
 insert into code (val, region_id) values ('124', 24);
 
 insert into region (id, name) values (25, 'Приморский край');
@@ -94,6 +92,7 @@ insert into code (val, region_id) values ('125', 25);
 
 insert into region (id, name) values (26, 'Ставропольский край');
 insert into code (val, region_id) values ('26', 26);
+insert into code (val, region_id) values ('126', 26);
 
 insert into region (id, name) values (27, 'Хабаровский край');
 insert into code (val, region_id) values ('27', 27);
@@ -132,12 +131,10 @@ insert into code (val, region_id) values ('37', 37);
 
 insert into region (id, name) values (38, 'Иркутская область');
 insert into code (val, region_id) values ('38', 38);
-insert into code (val, region_id) values ('85', 38);
 insert into code (val, region_id) values ('138', 38);
 
 insert into region (id, name) values (39, 'Калининградская область');
 insert into code (val, region_id) values ('39', 39);
-insert into code (val, region_id) values ('91', 39);
 
 insert into region (id, name) values (40, 'Калужская область');
 insert into code (val, region_id) values ('40', 40);
@@ -175,7 +172,9 @@ insert into region (id, name) values (50, 'Московская область')
 insert into code (val, region_id) values ('50', 50);
 insert into code (val, region_id) values ('90', 50);
 insert into code (val, region_id) values ('150', 50);
+insert into code (val, region_id) values ('250', 50);
 insert into code (val, region_id) values ('190', 50);
+insert into code (val, region_id) values ('550', 50);
 insert into code (val, region_id) values ('750', 50);
 insert into code (val, region_id) values ('790', 50);
 
@@ -185,6 +184,7 @@ insert into code (val, region_id) values ('51', 51);
 insert into region (id, name) values (52, 'Нижегородская область');
 insert into code (val, region_id) values ('52', 52);
 insert into code (val, region_id) values ('152', 52);
+insert into code (val, region_id) values ('252', 52);
 
 insert into region (id, name) values (53, 'Новгородская область');
 insert into code (val, region_id) values ('53', 53);
@@ -208,7 +208,6 @@ insert into code (val, region_id) values ('58', 58);
 
 insert into region (id, name) values (59, 'Пермский край');
 insert into code (val, region_id) values ('59', 59);
-insert into code (val, region_id) values ('81', 59);
 insert into code (val, region_id) values ('159', 59);
 
 insert into region (id, name) values (60, 'Псковская область');
@@ -225,6 +224,7 @@ insert into code (val, region_id) values ('62', 62);
 insert into region (id, name) values (63, 'Самарская область');
 insert into code (val, region_id) values ('63', 63);
 insert into code (val, region_id) values ('163', 63);
+insert into code (val, region_id) values ('763', 63);
 
 insert into region (id, name) values (64, 'Саратовская область');
 insert into code (val, region_id) values ('64', 64);
@@ -268,7 +268,6 @@ insert into code (val, region_id) values ('774', 74);
 
 insert into region (id, name) values (75, 'Забайкальский край');
 insert into code (val, region_id) values ('75', 75);
-insert into code (val, region_id) values ('80', 75);
 
 insert into region (id, name) values (76, 'Ярославская область');
 insert into code (val, region_id) values ('76', 76);
@@ -282,6 +281,7 @@ insert into code (val, region_id) values ('197', 77);
 insert into code (val, region_id) values ('199', 77);
 insert into code (val, region_id) values ('777', 77);
 insert into code (val, region_id) values ('797', 77);
+insert into code (val, region_id) values ('799', 77);
 
 insert into region (id, name) values (78, 'Санкт-Петербург');
 insert into code (val, region_id) values ('78', 78);
@@ -289,27 +289,44 @@ insert into code (val, region_id) values ('98', 78);
 insert into code (val, region_id) values ('178', 78);
 insert into code (val, region_id) values ('198', 78);
 
-insert into region (id, name) values (79, 'Еврейская автономная область');
+insert into region (id, name) values (79, 'Еврейская АО');
 insert into code (val, region_id) values ('79', 79);
 
-insert into region (id, name) values (80, 'Республика Крым');
-insert into code (val, region_id) values ('82', 80);
+insert into region (id, name) values (80, 'Донецкая Народная Республика');
+insert into code (val, region_id) values ('80', 80);
 
-insert into region (id, name) values (81, 'Ненецкий АО');
-insert into code (val, region_id) values ('83', 81);
+insert into region (id, name) values (81, 'Луганская Народная Республика');
+insert into code (val, region_id) values ('81', 81);
 
-insert into region (id, name) values (82, 'Ханты-Мансийский АО');
-insert into code (val, region_id) values ('86', 82);
-insert into code (val, region_id) values ('186', 82);
+insert into region (id, name) values (82, 'Республика Крым');
+insert into code (val, region_id) values ('82', 82);
 
-insert into region (id, name) values (83, 'Чукотский АО');
-insert into code (val, region_id) values ('87', 83);
+insert into region (id, name) values (83, 'Ненецкий АО');
+insert into code (val, region_id) values ('83', 83);
 
-insert into region (id, name) values (84, 'Ямало-Ненецкий АО');
-insert into code (val, region_id) values ('89', 84);
+insert into region (id, name) values (84, 'Херсонская область');
+insert into code (val, region_id) values ('84', 84);
+insert into code (val, region_id) values ('184', 84);
 
-insert into region (id, name) values (85, 'Севастополь');
-insert into code (val, region_id) values ('92', 85);
+insert into region (id, name) values (85, 'Запорожская область');
+insert into code (val, region_id) values ('85', 85);
+insert into code (val, region_id) values ('185', 85);
 
-insert into region (id, name) values (86, 'Байконур');
-insert into code (val, region_id) values ('94', 86);
+insert into region (id, name) values (86, 'Ханты-Мансийский АО');
+insert into code (val, region_id) values ('86', 86);
+insert into code (val, region_id) values ('186', 86);
+
+insert into region (id, name) values (87, 'Чукотский АО');
+insert into code (val, region_id) values ('87', 87);
+
+insert into region (id, name) values (89, 'Ямало-Ненецкий АО');
+insert into code (val, region_id) values ('89', 89);
+
+insert into region (id, name) values (92, 'Севастополь');
+insert into code (val, region_id) values ('92', 92);
+
+insert into region (id, name) values (94, 'Байконур');
+insert into code (val, region_id) values ('94', 94);
+
+insert into region (id, name) values (188, 'Харьковская область');
+insert into code (val, region_id) values ('188', 188);
