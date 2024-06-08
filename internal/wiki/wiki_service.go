@@ -44,7 +44,7 @@ func (t *today) Today() (*ThisDay, error) {
 
 	var res ThisDay
 
-	date, err := htmlquery.Query(todayNode, "//h2/span[2]/div[2]/a")
+	date, err := htmlquery.Query(todayNode, "//h2/div[2]/a")
 	if err != nil {
 		return nil, err
 	}
