@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bochkov/gobot/internal/services/quote"
@@ -9,7 +10,6 @@ import (
 )
 
 type QuoteAdapter struct {
-	*tg.AnswerWithPushAdapter
 	service quote.Service
 }
 
@@ -23,6 +23,17 @@ func (q QuoteAdapter) Description() string {
 
 func (q QuoteAdapter) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "цитат") || strings.Contains(strings.ToLower(text), "quote")
+}
+
+func (q QuoteAdapter) Answer(chatId int64, txt string) []tg.Method {
+	receivers := []string{strconv.FormatInt(chatId, 10)}
+	methods, err := q.PushData(receivers)
+	if err != nil {
+		sm := tg.SendMessage[int64]{ChatId: chatId}
+		sm.Text = "не получилось ("
+		return []tg.Method{&sm}
+	}
+	return methods
 }
 
 func (q QuoteAdapter) PushData(receivers []string) ([]tg.Method, error) {

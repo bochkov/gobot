@@ -1,8 +1,6 @@
 package tg
 
 import (
-	"strconv"
-
 	"github.com/bochkov/gobot/internal/push"
 )
 
@@ -22,19 +20,4 @@ type TgAnswerAdapter interface {
 	Description() string
 	IsMatch(text string) bool
 	Answer(chatId int64, txt string) []Method
-}
-
-type AnswerWithPushAdapter struct {
-	push TgPushAdapter
-}
-
-func (a *AnswerWithPushAdapter) Answer(chatId int64, txt string) []Method {
-	receivers := []string{strconv.FormatInt(chatId, 10)}
-	methods, err := a.push.PushData(receivers)
-	if err != nil {
-		sm := SendMessage[int64]{ChatId: chatId}
-		sm.Text = "не получилось ("
-		return []Method{&sm}
-	}
-	return methods
 }

@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bochkov/gobot/internal/services/wiki"
@@ -9,7 +10,6 @@ import (
 )
 
 type WikiAdapter struct {
-	*tg.AnswerWithPushAdapter
 	service wiki.Service
 }
 
@@ -23,6 +23,17 @@ func (w WikiAdapter) Description() string {
 
 func (w WikiAdapter) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "today")
+}
+
+func (w WikiAdapter) Answer(chatId int64, txt string) []tg.Method {
+	receivers := []string{strconv.FormatInt(chatId, 10)}
+	methods, err := w.PushData(receivers)
+	if err != nil {
+		sm := tg.SendMessage[int64]{ChatId: chatId}
+		sm.Text = "не получилось ("
+		return []tg.Method{&sm}
+	}
+	return methods
 }
 
 func (w WikiAdapter) PushData(receivers []string) ([]tg.Method, error) {

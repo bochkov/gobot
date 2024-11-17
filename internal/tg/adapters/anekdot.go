@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bochkov/gobot/internal/services/anekdot"
@@ -9,7 +10,6 @@ import (
 )
 
 type AnekdotAdapter struct {
-	*tg.AnswerWithPushAdapter
 	service anekdot.Service
 }
 
@@ -23,6 +23,17 @@ func (a AnekdotAdapter) Description() string {
 
 func (a AnekdotAdapter) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "анек") || strings.Contains(strings.ToLower(text), "joke")
+}
+
+func (a AnekdotAdapter) Answer(chatId int64, txt string) []tg.Method {
+	receivers := []string{strconv.FormatInt(chatId, 10)}
+	methods, err := a.PushData(receivers)
+	if err != nil {
+		sm := tg.SendMessage[int64]{ChatId: chatId}
+		sm.Text = "не получилось ("
+		return []tg.Method{&sm}
+	}
+	return methods
 }
 
 func (a AnekdotAdapter) PushData(receivers []string) ([]tg.Method, error) {
