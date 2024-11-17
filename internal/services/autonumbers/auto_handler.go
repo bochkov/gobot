@@ -20,7 +20,6 @@ func (h *Handler) AutonumbersHandler(w http.ResponseWriter, req *http.Request) {
 		region, err := h.Service.FindRegionByCode(req.Context(), code)
 		util.JsonResponse(w, region, err)
 		return
-
 	}
 
 	region := req.URL.Query().Get("region")

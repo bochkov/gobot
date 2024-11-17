@@ -16,15 +16,20 @@ import (
 )
 
 type service struct {
-	workers []Worker
+	adapters []TgAnswerAdapter
+	push     TgPushAdapter
 }
 
-func NewService(workers ...Worker) Service {
-	return &service{workers: workers}
+func NewAnswerService(adapters ...TgAnswerAdapter) Service {
+	return &service{adapters: adapters}
 }
 
-func (s *service) GetAnswers(chatId int64, txt string) []Method {
-	for _, serv := range s.workers {
+func NewPushService(push TgPushAdapter) Service {
+	return &service{push: push}
+}
+
+func (s service) GetAnswers(chatId int64, txt string) []Method {
+	for _, serv := range s.adapters {
 		if serv.IsMatch(txt) {
 			slog.Info(fmt.Sprintf("choosed = %s", serv.Description()))
 			return serv.Answer(chatId, txt)
@@ -33,7 +38,7 @@ func (s *service) GetAnswers(chatId int64, txt string) []Method {
 	return nil
 }
 
-func (s *service) Execute(method Method, token string) (*TypedResult[any], error) {
+func (s service) Execute(method Method, token string) (*TypedResult[any], error) {
 	methodName, methodResponse := method.Describe()
 	slog.Info("request", "method", methodName, "body", util.ToJson(method))
 	res := &TypedResult[any]{
@@ -59,28 +64,25 @@ func (s *service) Execute(method Method, token string) (*TypedResult[any], error
 	return res, nil
 }
 
-func (s *service) Push(text string) {
-	if text == "" {
-		slog.Warn("empty text")
-		return
-	}
+func (s service) Push() {
 	token := db.GetProp(db.TgBotTokenKey, "")
 	if token == "" {
 		slog.Warn("no token specified")
 		return
 	}
-	chatId := db.GetProp(db.ChatAutoSend, "") // TODO
+	chatId := db.GetProp(db.ChatAutoSend, "")
 	if chatId == "" {
 		slog.Warn("no chat.id specified")
 		return
 	}
-	for _, chat := range strings.Split(chatId, ";") {
-		sm := new(SendMessage[string])
-		sm.ChatId = chat
-		sm.Text = text
-		sm.SendOptions.DisableNotification = true
-		sm.SendOptions.ParseMode = HTML
-		if _, exec := s.Execute(sm, token); exec != nil {
+	receivers := strings.Split(chatId, ";")
+	sm, err := s.push.PushData(receivers)
+	if err != nil {
+		slog.Warn("cannot invoke push", "err", err.Error())
+		return
+	}
+	for _, m := range sm {
+		if _, exec := s.Execute(m, token); exec != nil {
 			slog.Warn(exec.Error())
 		}
 	}

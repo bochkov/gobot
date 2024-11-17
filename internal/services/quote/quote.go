@@ -3,7 +3,7 @@ package quote
 import (
 	"fmt"
 
-	"github.com/bochkov/gobot/internal/push"
+	"github.com/bochkov/gobot/internal/services"
 )
 
 type Quote struct {
@@ -19,7 +19,6 @@ func (q *Quote) String() string {
 }
 
 type Service interface {
-	push.Push
+	services.Service
 	RandomQuote() (*Quote, error)
-	Description() string
 }

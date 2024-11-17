@@ -1,7 +1,7 @@
 package anekdot
 
 import (
-	"github.com/bochkov/gobot/internal/push"
+	"github.com/bochkov/gobot/internal/services"
 )
 
 type Anekdot struct {
@@ -10,8 +10,7 @@ type Anekdot struct {
 }
 
 type Service interface {
-	push.Push
+	services.Service
 	GetRandom() (*Anekdot, error)
 	GetById(id int) (*Anekdot, error)
-	Description() string
 }

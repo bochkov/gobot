@@ -1,6 +1,10 @@
 package autonumbers
 
-import "context"
+import (
+	"context"
+
+	"github.com/bochkov/gobot/internal/services"
+)
 
 type Code struct {
 	Id    int    `json:"id" db:"id"`
@@ -19,7 +23,7 @@ type Repository interface {
 }
 
 type Service interface {
+	services.Service
 	FindRegionByCode(ctx context.Context, code string) (*Region, error)
 	FindRegionByName(ctx context.Context, name string) ([]Region, error)
-	Description() string
 }

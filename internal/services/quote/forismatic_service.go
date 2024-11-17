@@ -13,6 +13,10 @@ func NewService() Service {
 	return &forismatic{}
 }
 
+func (f *forismatic) Description() string {
+	return "Случайная цитата от forismatic.com"
+}
+
 func (f *forismatic) RandomQuote() (*Quote, error) {
 	var quote Quote
 	if err := requests.
@@ -25,8 +29,4 @@ func (f *forismatic) RandomQuote() (*Quote, error) {
 		return nil, err
 	}
 	return &quote, nil
-}
-
-func (f *forismatic) Description() string {
-	return "Случайная цитата от forismatic.com"
 }

@@ -3,13 +3,13 @@ package router
 import (
 	"time"
 
-	"github.com/bochkov/gobot/internal/anekdot"
-	"github.com/bochkov/gobot/internal/autonumbers"
-	"github.com/bochkov/gobot/internal/cbr"
-	"github.com/bochkov/gobot/internal/push"
-	"github.com/bochkov/gobot/internal/quote"
+	"github.com/bochkov/gobot/internal/services/anekdot"
+	"github.com/bochkov/gobot/internal/services/autonumbers"
+	"github.com/bochkov/gobot/internal/services/cbr"
+	"github.com/bochkov/gobot/internal/services/dev"
+	"github.com/bochkov/gobot/internal/services/quote"
+	"github.com/bochkov/gobot/internal/services/wiki"
 	"github.com/bochkov/gobot/internal/tg"
-	"github.com/bochkov/gobot/internal/wiki"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -23,7 +23,7 @@ type Handlers struct {
 	Quotes   *quote.Handler
 	Wiki     *wiki.Handler
 	Telegram *tg.Handler
-	Dev      *push.DevHandler
+	Dev      *dev.Handler
 }
 
 func ConfigureRouter(h *Handlers, dev bool) *chi.Mux {

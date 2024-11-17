@@ -1,6 +1,7 @@
 package wiki
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/antchfx/htmlquery"
@@ -55,9 +56,10 @@ func (t *today) Today() (*ThisDay, error) {
 		res.WorldDay = t.sanitizeHtml(htmlquery.OutputHTML(worldDay, true))
 	}
 
-	img, _ := htmlquery.Query(todayNode, "//figure/a")
+	img, _ := htmlquery.Query(todayNode, "//figure/a/img")
 	if img != nil {
-		res.ImgSrc = t.sanitizeHtml(htmlquery.SelectAttr(img, "href"))
+		src := "https:" + htmlquery.SelectAttr(img, "src")
+		res.ImgSrc = regexp.MustCompile(`\d+px`).ReplaceAllString(src, "1000px")
 	}
 
 	list, err := htmlquery.QueryAll(todayNode, "//ul/li")

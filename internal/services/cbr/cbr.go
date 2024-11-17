@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/bochkov/gobot/internal/push"
+	"github.com/bochkov/gobot/internal/services"
 )
 
 type Currency struct {
@@ -76,13 +76,8 @@ type TaskRepository interface {
 }
 
 type Service interface {
-	push.Push
+	services.Service
 	LatestRate(ctx context.Context) (*CurrRate, error)
 	LatestRange(ctx context.Context, currencies []string) []CalcRange
 	RangeOf(ctx context.Context, code string, from time.Time, to time.Time) (*CurrRange, error)
-	Description() string
-}
-
-type Handler struct {
-	Service
 }

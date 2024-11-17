@@ -19,6 +19,10 @@ func NewService() Service {
 	return &service{}
 }
 
+func (s *service) Description() string {
+	return "fetch torrents from rutor"
+}
+
 func (s *service) FetchTorrent(url string) (*Torrent, error) {
 	tor, err := s.getUrls(url)
 	if err != nil {

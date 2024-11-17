@@ -1,6 +1,7 @@
 package rutor
 
 import (
+	"github.com/bochkov/gobot/internal/services"
 	"golang.org/x/net/html"
 )
 
@@ -12,6 +13,7 @@ type Torrent struct {
 }
 
 type Service interface {
+	services.Service
 	FetchTorrent(url string) (*Torrent, error)
 }
 

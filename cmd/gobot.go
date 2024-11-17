@@ -11,18 +11,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bochkov/gobot/internal/anekdot"
-	"github.com/bochkov/gobot/internal/autonumbers"
-	"github.com/bochkov/gobot/internal/cbr"
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/lib/router"
 	"github.com/bochkov/gobot/internal/lib/tasks"
-	"github.com/bochkov/gobot/internal/push"
-	"github.com/bochkov/gobot/internal/quote"
-	"github.com/bochkov/gobot/internal/rutor"
+	"github.com/bochkov/gobot/internal/services/anekdot"
+	"github.com/bochkov/gobot/internal/services/autonumbers"
+	"github.com/bochkov/gobot/internal/services/cbr"
+	"github.com/bochkov/gobot/internal/services/dev"
+	"github.com/bochkov/gobot/internal/services/quote"
+	"github.com/bochkov/gobot/internal/services/rutor"
+	"github.com/bochkov/gobot/internal/services/wiki"
 	"github.com/bochkov/gobot/internal/tg"
+	"github.com/bochkov/gobot/internal/tg/adapters"
 	"github.com/bochkov/gobot/internal/util"
-	"github.com/bochkov/gobot/internal/wiki"
 
 	"github.com/go-co-op/gocron"
 	"github.com/lmittmann/tint"
@@ -73,18 +74,21 @@ func main() {
 	sCbrTasks := cbr.NewTaskService(
 		cbr.NewTaskRepo(dbcp),
 	)
-	sTelegram := tg.NewService(
-		tg.NewAnekdotWorker(sAnekdot),
-		tg.NewAutoWorker(sAutonumbers),
-		tg.NewQuoteWorker(sQuotes),
-		tg.NewCbrWorker(sCbr),
-		tg.NewRutorWorker(sTorrent),
-		tg.NewWikiWorker(sWikiToday),
+	sTelegram := tg.NewAnswerService(
+		adapters.NewAnekdotAdapter(sAnekdot),
+		adapters.NewAutoAdapter(sAutonumbers),
+		adapters.NewCbrAdapter(sCbr),
+		adapters.NewQuoteAdapter(sQuotes),
+		adapters.NewRutorAdapter(sTorrent),
+		adapters.NewWikiAdapter(sWikiToday),
+	)
+	pTelegram := tg.NewPushService(
+		adapters.NewWikiAdapter(sWikiToday),
 	)
 
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
-	tasks.Schedule(scheduler, sTelegram, sWikiToday, tasks.SchedParam{
+	tasks.Schedule(scheduler, pTelegram, tasks.SchedParam{
 		Desc: "wiki today", CronProp: db.WikiScheduler, CronDef: "0 6 * * *",
 	})
 	sCbrTasks.Schedule(scheduler)
@@ -98,7 +102,7 @@ func main() {
 		Quotes:   quote.NewHandler(sQuotes),
 		Wiki:     wiki.NewHandler(sWikiToday),
 		Telegram: tg.NewHandler(sTelegram),
-		Dev:      push.NewHandler(sTelegram, sWikiToday),
+		Dev:      dev.NewHandler(pTelegram),
 	}
 	routes := router.ConfigureRouter(handlers, flags.InvokeForTesting())
 	srv := &http.Server{Addr: flags.ServeAddr(), Handler: routes}

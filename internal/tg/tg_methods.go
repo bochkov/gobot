@@ -45,8 +45,8 @@ type SendOptions struct {
 }
 
 type InputFile struct {
-	bytes    []byte
-	filename string
+	Bytes    []byte
+	Filename string
 }
 
 type InlineKbButton struct {
@@ -113,8 +113,8 @@ func ToMultipart(method MultipartMethod, w io.Writer) (string, error) {
 	}
 	// write binary field
 	name, field := method.InputFileInfo()
-	x, _ := mp.CreateFormFile(name, field.filename)
-	if _, er := x.Write(field.bytes); er != nil {
+	x, _ := mp.CreateFormFile(name, field.Filename)
+	if _, er := x.Write(field.Bytes); er != nil {
 		return "", er
 	}
 	if er := mp.Close(); er != nil {
