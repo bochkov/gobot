@@ -70,7 +70,7 @@ func (sm *SendMessage[T]) Describe() (string, any) {
 }
 
 type SendPhoto[T IntOrString] struct {
-	ChatId T      `json:"chat_id,string"`
+	ChatId T      `json:"chat_id"`
 	Photo  string `json:"photo"`
 	Text   string `json:"caption"`
 	SendOptions
@@ -81,7 +81,7 @@ func (sm *SendPhoto[T]) Describe() (string, any) {
 }
 
 type SendDocument[T IntOrString] struct {
-	ChatId                      T         `json:"chat_id,string"`
+	ChatId                      T         `json:"chat_id"`
 	InputFile                   InputFile `json:"-"`
 	Caption                     string    `json:"caption,omitempty"`
 	DisableContentTypeDetection bool      `json:"disable_content_type_detection,omitempty"`

@@ -5,34 +5,27 @@ import (
 	"strings"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/bochkov/gobot/internal/services"
 	"github.com/microcosm-cc/bluemonday"
 )
 
-const WikiUrl string = "https://ru.wikipedia.org/wiki/%D0%97%D0%B0%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%B8%D1%86%D0%B0"
-
-type today struct {
-	sanitizer *bluemonday.Policy
+type ItdService struct {
+	services.Service
+	p *bluemonday.Policy
 }
 
-func NewService() Service {
+func NewItd() *ItdService {
 	p := bluemonday.NewPolicy()
 	p.AllowElements("b", "strong", "i", "em")
 	p.AllowAttrs("href").OnElements("a")
-	return &today{sanitizer: p}
+	return &ItdService{p: p}
 }
 
-func (t *today) Description() string {
+func (s *ItdService) Description() string {
 	return "В этот день"
 }
 
-func (t *today) sanitizeHtml(source string) string {
-	html := strings.ReplaceAll(
-		source, "/wiki", "https://ru.wikipedia.org/wiki",
-	)
-	return t.sanitizer.Sanitize(html)
-}
-
-func (t *today) Today() (*ThisDay, error) {
+func (s *ItdService) Itd() (*ThisDay, error) {
 	doc, err := htmlquery.LoadURL(WikiUrl)
 	if err != nil {
 		return nil, err
@@ -49,11 +42,11 @@ func (t *today) Today() (*ThisDay, error) {
 	if err != nil {
 		return nil, err
 	}
-	res.Date = t.sanitizeHtml(htmlquery.OutputHTML(date, true))
+	res.Date = sanitizeHtml(s.p, htmlquery.OutputHTML(date, true))
 
 	worldDay, _ := htmlquery.Query(todayNode, "//p")
 	if worldDay != nil {
-		res.WorldDay = t.sanitizeHtml(htmlquery.OutputHTML(worldDay, true))
+		res.WorldDay = sanitizeHtml(s.p, htmlquery.OutputHTML(worldDay, true))
 	}
 
 	img, _ := htmlquery.Query(todayNode, "//figure/a/img")
@@ -70,7 +63,7 @@ func (t *today) Today() (*ThisDay, error) {
 	var sb strings.Builder
 	for _, n := range list {
 		sb.WriteString("\n")
-		sb.WriteString(t.sanitizeHtml(htmlquery.OutputHTML(n, false)))
+		sb.WriteString(sanitizeHtml(s.p, htmlquery.OutputHTML(n, false)))
 	}
 	res.Text = sb.String()
 

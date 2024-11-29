@@ -3,6 +3,7 @@ package dev
 import (
 	"net/http"
 
+	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/push"
 )
 
@@ -15,5 +16,5 @@ func NewHandler(service push.Service) *Handler {
 }
 
 func (h *Handler) DevHandler(w http.ResponseWriter, req *http.Request) {
-	h.Service.Push()
+	h.Service.Push([]string{db.GetProp(db.ChatIdKey, "")})
 }

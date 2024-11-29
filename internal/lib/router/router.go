@@ -46,7 +46,10 @@ func ConfigureRouter(h *Handlers, dev bool) *chi.Mux {
 	r.Get("/cbr/latest", h.Cbr.LatestRates)
 	r.Get("/cbr/{period:month|year}/{currency}", h.Cbr.PeriodRates)
 
-	r.Get("/today", h.Wiki.WikiHandler)
+	r.Route("/wiki", func(r chi.Router) {
+		r.Get("/today", h.Wiki.Itd)
+		r.Get("/potd", h.Wiki.Potd)
+	})
 
 	if dev {
 		r.Get("/bot/push", h.Dev.DevHandler)

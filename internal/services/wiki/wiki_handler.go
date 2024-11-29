@@ -7,14 +7,20 @@ import (
 )
 
 type Handler struct {
-	Service
+	itd  *ItdService
+	potd *PotdService
 }
 
-func NewHandler(s Service) *Handler {
-	return &Handler{Service: s}
+func NewHandler(itd *ItdService, potd *PotdService) *Handler {
+	return &Handler{itd: itd, potd: potd}
 }
 
-func (h *Handler) WikiHandler(w http.ResponseWriter, req *http.Request) {
-	an, err := h.Service.Today()
-	util.JsonResponse(w, an, err)
+func (h *Handler) Itd(w http.ResponseWriter, r *http.Request) {
+	data, err := h.itd.Itd()
+	util.JsonResponse(w, data, err)
+}
+
+func (h *Handler) Potd(w http.ResponseWriter, r *http.Request) {
+	data, err := h.potd.Potd()
+	util.JsonResponse(w, data, err)
 }

@@ -1,7 +1,6 @@
 package tasks
 
 import (
-	"fmt"
 	"log/slog"
 
 	"github.com/bochkov/gobot/internal/lib/db"
@@ -14,20 +13,21 @@ type Scheduled interface {
 }
 
 type SchedParam struct {
-	Desc     string
-	CronProp string
-	CronDef  string
+	Desc       string
+	CronProp   string
+	CronDef    string
+	Recipients []string
 }
 
 func Schedule(scheduler *gocron.Scheduler, service push.Service, param SchedParam) {
 	cron := db.GetProp(param.CronProp, param.CronDef)
 	_, err := scheduler.Cron(cron).Do(func() {
 		slog.Info("execute tasks", "task", param.Desc)
-		service.Push()
+		service.Push(param.Recipients)
 	})
 	if err != nil {
 		slog.Warn(err.Error())
 	} else {
-		slog.Info(fmt.Sprintf("scheduled %s at '%s'", param.Desc, cron))
+		slog.Info("scheduled", "task", param.Desc, "at", cron)
 	}
 }

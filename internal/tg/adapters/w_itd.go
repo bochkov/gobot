@@ -9,23 +9,23 @@ import (
 	"github.com/bochkov/gobot/internal/tg"
 )
 
-type WikiAdapter struct {
-	service wiki.Service
+type WItdAdapter struct {
+	service *wiki.ItdService
 }
 
-func NewWikiAdapter(s wiki.Service) WikiAdapter {
-	return WikiAdapter{service: s}
+func NewWItdAdapter(s *wiki.ItdService) *WItdAdapter {
+	return &WItdAdapter{service: s}
 }
 
-func (w WikiAdapter) Description() string {
+func (w *WItdAdapter) Description() string {
 	return w.service.Description()
 }
 
-func (w WikiAdapter) IsMatch(text string) bool {
+func (w *WItdAdapter) IsMatch(text string) bool {
 	return strings.Contains(strings.ToLower(text), "today")
 }
 
-func (w WikiAdapter) Answer(chatId int64, txt string) []tg.Method {
+func (w *WItdAdapter) Answer(chatId int64, txt string) []tg.Method {
 	receivers := []string{strconv.FormatInt(chatId, 10)}
 	methods, err := w.PushData(receivers)
 	if err != nil {
@@ -36,8 +36,8 @@ func (w WikiAdapter) Answer(chatId int64, txt string) []tg.Method {
 	return methods
 }
 
-func (w WikiAdapter) PushData(receivers []string) ([]tg.Method, error) {
-	t, err := w.service.Today()
+func (w *WItdAdapter) PushData(receivers []string) ([]tg.Method, error) {
+	t, err := w.service.Itd()
 	if err != nil {
 		return nil, err
 	}

@@ -64,26 +64,24 @@ func (s service) Execute(method Method, token string) (*TypedResult[any], error)
 	return res, nil
 }
 
-func (s service) Push() {
+func (s service) Push(recepients []string) {
 	token := db.GetProp(db.TgBotTokenKey, "")
 	if token == "" {
 		slog.Warn("no token specified")
 		return
 	}
-	chatId := db.GetProp(db.ChatAutoSend, "")
-	if chatId == "" {
-		slog.Warn("no chat.id specified")
-		return
-	}
-	receivers := strings.Split(chatId, ";")
-	sm, err := s.push.PushData(receivers)
-	if err != nil {
-		slog.Warn("cannot invoke push", "err", err.Error())
-		return
-	}
-	for _, m := range sm {
-		if _, exec := s.Execute(m, token); exec != nil {
-			slog.Warn(exec.Error())
+
+	for _, recv := range recepients {
+		receivers := strings.Split(recv, ";")
+		sm, err := s.push.PushData(receivers)
+		if err != nil {
+			slog.Warn("cannot invoke push", "err", err.Error())
+			return
+		}
+		for _, m := range sm {
+			if _, exec := s.Execute(m, token); exec != nil {
+				slog.Warn(exec.Error())
+			}
 		}
 	}
 }
