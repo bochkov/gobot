@@ -143,18 +143,22 @@ func main() {
 
 	/// scheduler
 	scheduler := gocron.NewScheduler(time.UTC)
-	tasks.Schedule(scheduler, sTelegram, tasks.SchedParam{
-		Desc:       "wiki today",
-		CronProp:   db.WikiScheduler,
-		CronDef:    "0 6 * * *",
-		Recipients: []string{db.ChatAutoSend},
-	})
-	tasks.Schedule(scheduler, sTelegram, tasks.SchedParam{
-		Desc:       "wiki pic of the day",
-		CronProp:   db.WikiScheduler,
-		CronDef:    "0 6 * * *",
-		Recipients: []string{db.ChatIdKey},
-	})
+	tasks.Schedule(scheduler,
+		tg.NewPushService(adapters.NewWItdAdapter(sItd)),
+		tasks.SchedParam{
+			Desc:     "wiki today",
+			CronProp: db.WikiScheduler,
+			CronDef:  "* * * * *",
+			RecvProp: db.ChatAutoSend,
+		})
+	tasks.Schedule(scheduler,
+		tg.NewPushService(adapters.NewWPotdAdapter(sPotd)),
+		tasks.SchedParam{
+			Desc:     "wiki pic of the day",
+			CronProp: db.WikiScheduler,
+			CronDef:  "* * * * *",
+			RecvProp: db.ChatIdKey,
+		})
 	sCbrTasks.Schedule(scheduler)
 	scheduler.StartAsync()
 

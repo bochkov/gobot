@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
-	"strings"
 
 	"log/slog"
 
@@ -71,17 +70,14 @@ func (s service) Push(recepients []string) {
 		return
 	}
 
-	for _, recv := range recepients {
-		receivers := strings.Split(recv, ";")
-		sm, err := s.push.PushData(receivers)
-		if err != nil {
-			slog.Warn("cannot invoke push", "err", err.Error())
-			return
-		}
-		for _, m := range sm {
-			if _, exec := s.Execute(m, token); exec != nil {
-				slog.Warn(exec.Error())
-			}
+	sm, err := s.push.PushData(recepients)
+	if err != nil {
+		slog.Warn("cannot invoke push", "err", err.Error())
+		return
+	}
+	for _, m := range sm {
+		if _, exec := s.Execute(m, token); exec != nil {
+			slog.Warn(exec.Error())
 		}
 	}
 }

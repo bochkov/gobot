@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"log/slog"
+	"strings"
 
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/push"
@@ -13,17 +14,22 @@ type Scheduled interface {
 }
 
 type SchedParam struct {
-	Desc       string
-	CronProp   string
-	CronDef    string
-	Recipients []string
+	Desc     string
+	CronProp string
+	CronDef  string
+	RecvProp string
 }
 
 func Schedule(scheduler *gocron.Scheduler, service push.Service, param SchedParam) {
 	cron := db.GetProp(param.CronProp, param.CronDef)
 	_, err := scheduler.Cron(cron).Do(func() {
-		slog.Info("execute tasks", "task", param.Desc)
-		service.Push(param.Recipients)
+		recv := db.GetProp(param.RecvProp, "")
+		if recv == "" {
+			slog.Info("task not executed because recipients is empty", "task", param.Desc)
+			return
+		}
+		slog.Info("execute", "task", param.Desc)
+		service.Push(strings.Split(recv, ";"))
 	})
 	if err != nil {
 		slog.Warn(err.Error())
