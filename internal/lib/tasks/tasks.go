@@ -16,12 +16,11 @@ type Scheduled interface {
 type SchedParam struct {
 	Desc     string
 	CronProp string
-	CronDef  string
 	RecvProp string
 }
 
 func Schedule(scheduler *gocron.Scheduler, service push.Service, param SchedParam) {
-	cron := db.GetProp(param.CronProp, param.CronDef)
+	cron := db.GetProp(param.CronProp, "* * * * *")
 	_, err := scheduler.Cron(cron).Do(func() {
 		recv := db.GetProp(param.RecvProp, "")
 		if recv == "" {

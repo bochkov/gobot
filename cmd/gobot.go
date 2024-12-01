@@ -148,7 +148,6 @@ func main() {
 		tasks.SchedParam{
 			Desc:     "wiki today",
 			CronProp: db.WikiScheduler,
-			CronDef:  "* * * * *",
 			RecvProp: db.ChatAutoSend,
 		})
 	tasks.Schedule(scheduler,
@@ -156,7 +155,13 @@ func main() {
 		tasks.SchedParam{
 			Desc:     "wiki pic of the day",
 			CronProp: db.WikiScheduler,
-			CronDef:  "* * * * *",
+			RecvProp: db.ChatIdKey,
+		})
+	tasks.Schedule(scheduler,
+		tg.NewPushService(adapters.NewAnekdotAdapter(sAnekdot)),
+		tasks.SchedParam{
+			Desc:     "anek of the day",
+			CronProp: db.AnekdotScheduler,
 			RecvProp: db.ChatIdKey,
 		})
 	sCbrTasks.Schedule(scheduler)
