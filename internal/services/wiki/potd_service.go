@@ -2,6 +2,7 @@ package wiki
 
 import (
 	"github.com/antchfx/htmlquery"
+	"github.com/bochkov/gobot/internal/lib/htmlq"
 	"github.com/bochkov/gobot/internal/services"
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -23,7 +24,7 @@ func (s *PotdService) Description() string {
 }
 
 func (s *PotdService) Potd() (*PicOfDay, error) {
-	doc, err := htmlquery.LoadURL(WikiUrl)
+	doc, err := htmlq.LoadURL(WikiUrl)
 	if err != nil {
 		return nil, err
 	}

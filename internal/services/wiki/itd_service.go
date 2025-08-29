@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/antchfx/htmlquery"
+	"github.com/bochkov/gobot/internal/lib/htmlq"
 	"github.com/bochkov/gobot/internal/services"
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -26,7 +27,7 @@ func (s *ItdService) Description() string {
 }
 
 func (s *ItdService) Itd() (*ThisDay, error) {
-	doc, err := htmlquery.LoadURL(WikiUrl)
+	doc, err := htmlq.LoadURL(WikiUrl)
 	if err != nil {
 		return nil, err
 	}
