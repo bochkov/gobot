@@ -22,7 +22,7 @@ type PicOfDay struct {
 
 func sanitizeHtml(p *bluemonday.Policy, source string) string {
 	html := strings.ReplaceAll(
-		source, "/wiki", "https://ru.wikipedia.org/wiki",
+		source, "//ru.wikipedia.org/", "https://ru.wikipedia.org/",
 	)
 	return p.Sanitize(html)
 }

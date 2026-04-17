@@ -175,7 +175,8 @@ func main() {
 		Quotes:   quote.NewHandler(sQuotes),
 		Wiki:     wiki.NewHandler(sItd, sPotd),
 		Telegram: tg.NewHandler(sTelegram),
-		Dev:      dev.NewHandler(tg.NewPushService(adapters.NewWPotdAdapter(sPotd))),
+		Dev:      dev.NewHandler(tg.NewPushService(adapters.NewWItdAdapter(sItd))),
+		// Dev:      dev.NewHandler(tg.NewPushService(adapters.NewWPotdAdapter(sPotd))),
 	}
 	routes := router.ConfigureRouter(handlers, opts.dev)
 	srv := &http.Server{Addr: opts.serveAddr(), Handler: routes}
