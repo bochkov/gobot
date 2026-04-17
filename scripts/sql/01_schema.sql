@@ -54,7 +54,7 @@ create table currency_rate_record
     num_code   varchar(3),
     char_code  varchar(3),
     nominal    int,
-    loc_name       varchar(100),
+    loc_name   varchar(100),
     rate_value numeric(10, 4),
     foreign key (rate_id) references currency_rate (id)
 );
