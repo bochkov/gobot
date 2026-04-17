@@ -10,6 +10,7 @@ const (
 	ChatIdKey        string = "chat.id"
 	AnekdotScheduler string = "schedule.anekdot"
 	WikiScheduler    string = "schedule.wiki"
+	TmpMsgSchedulr   string = "schedule.tmp_msg"
 )
 
 func GetProp(key string, def string) string {

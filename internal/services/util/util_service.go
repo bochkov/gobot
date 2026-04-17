@@ -24,9 +24,10 @@ func (ts *taskService) Schedule(scheduler gocron.Scheduler) {
 	var err error
 	ctx := context.Background()
 
+	cron := db.GetProp(db.TmpMsgSchedulr, "0 0 * * *")
 	// At 00:00.
 	_, err = scheduler.NewJob(
-		gocron.CronJob("* * * * *", false),
+		gocron.CronJob(cron, false),
 		gocron.NewTask(ts.doMaitenanceJob),
 		gocron.WithContext(ctx),
 	)

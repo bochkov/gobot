@@ -21,7 +21,7 @@ type SchedParam struct {
 }
 
 func Schedule(scheduler gocron.Scheduler, service push.Service, param SchedParam) {
-	cron := db.GetProp(param.CronProp, "* * 1 * *")
+	cron := db.GetProp(param.CronProp, "* * * * *")
 	_, err := scheduler.NewJob(
 		gocron.CronJob(cron, false),
 		gocron.NewTask(func() {
