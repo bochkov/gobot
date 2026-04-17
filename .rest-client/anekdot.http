@@ -1,0 +1,3 @@
+
+### random anekdot
+GET http://localhost:5000/anekdot

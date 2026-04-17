@@ -1,0 +1,9 @@
+
+### day in history
+GET http://localhost:5000/wiki/today
+
+### picture of the day
+GET http://localhost:5000/wiki/potd
+
+### dev - tg push 
+GET http://localhost:5000/bot/push

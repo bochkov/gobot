@@ -1,0 +1,5 @@
+### get by region
+GET http://localhost:5000/auto?region=алта
+
+### get by code
+GET http://localhost:5000/auto?code=96
