@@ -16,17 +16,19 @@ import (
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/lib/router"
 	"github.com/bochkov/gobot/internal/lib/tasks"
+	"github.com/bochkov/gobot/internal/repo"
 	"github.com/bochkov/gobot/internal/services/anekdot"
 	"github.com/bochkov/gobot/internal/services/autonumbers"
 	"github.com/bochkov/gobot/internal/services/cbr"
 	"github.com/bochkov/gobot/internal/services/dev"
 	"github.com/bochkov/gobot/internal/services/quote"
 	"github.com/bochkov/gobot/internal/services/rutor"
+	"github.com/bochkov/gobot/internal/services/util"
 	"github.com/bochkov/gobot/internal/services/wiki"
 	"github.com/bochkov/gobot/internal/tg"
 	"github.com/bochkov/gobot/internal/tg/adapters"
 
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 	"github.com/lmittmann/tint"
 )
 
@@ -115,6 +117,8 @@ func main() {
 	if err := dbcp.QueryRow(ctx, "select version()").Scan(&version); err == nil {
 		slog.Info(version)
 	}
+	/// dao
+	tmpMsgDao := repo.NewTmpMsgDao(dbcp)
 
 	/// services
 	sItd := wiki.NewItd()
@@ -140,11 +144,12 @@ func main() {
 		adapters.NewWItdAdapter(sItd),
 		adapters.NewWPotdAdapter(sPotd),
 	)
+	sMaitenance := util.NewTaskService(tmpMsgDao, sTelegram)
 
 	/// scheduler
-	scheduler := gocron.NewScheduler(time.UTC)
+	scheduler, _ := gocron.NewScheduler()
 	tasks.Schedule(scheduler,
-		tg.NewPushService(adapters.NewWItdAdapter(sItd)),
+		tg.NewPushTmpService(adapters.NewWItdAdapter(sItd), tmpMsgDao),
 		tasks.SchedParam{
 			Desc:     "wiki today",
 			CronProp: db.WikiScheduler,
@@ -165,7 +170,8 @@ func main() {
 			RecvProp: db.ChatIdKey,
 		})
 	sCbrTasks.Schedule(scheduler)
-	scheduler.StartAsync()
+	sMaitenance.Schedule(scheduler)
+	scheduler.Start()
 
 	/// handlers
 	handlers := &router.Handlers{
@@ -175,7 +181,7 @@ func main() {
 		Quotes:   quote.NewHandler(sQuotes),
 		Wiki:     wiki.NewHandler(sItd, sPotd),
 		Telegram: tg.NewHandler(sTelegram),
-		Dev:      dev.NewHandler(tg.NewPushService(adapters.NewWItdAdapter(sItd))),
+		Dev:      dev.NewHandler(tg.NewPushTmpService(adapters.NewWItdAdapter(sItd), tmpMsgDao)),
 		// Dev:      dev.NewHandler(tg.NewPushService(adapters.NewWPotdAdapter(sPotd))),
 	}
 	routes := router.ConfigureRouter(handlers, opts.dev)
@@ -197,7 +203,7 @@ func main() {
 	stopCtx, cStop := context.WithTimeout(ctx, 5*time.Second)
 	defer cStop()
 
-	scheduler.Stop()
+	scheduler.ShutdownWithContext(stopCtx)
 	if err := srv.Shutdown(stopCtx); err != nil {
 		slog.Warn("shutdown", "err", err)
 	}

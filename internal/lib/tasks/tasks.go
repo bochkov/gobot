@@ -6,30 +6,34 @@ import (
 
 	"github.com/bochkov/gobot/internal/lib/db"
 	"github.com/bochkov/gobot/internal/push"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 )
 
 type Scheduled interface {
-	Schedule(schedule *gocron.Scheduler)
+	Schedule(schedule gocron.Scheduler)
 }
 
 type SchedParam struct {
-	Desc     string
-	CronProp string
-	RecvProp string
+	Desc         string
+	CronProp     string
+	RecvProp     string
+	TemporaryMsg bool
 }
 
-func Schedule(scheduler *gocron.Scheduler, service push.Service, param SchedParam) {
-	cron := db.GetProp(param.CronProp, "* * * * *")
-	_, err := scheduler.Cron(cron).Do(func() {
-		recv := db.GetProp(param.RecvProp, "")
-		if recv == "" {
-			slog.Info("task not executed because recipients is empty", "task", param.Desc)
-			return
-		}
-		slog.Info("execute", "task", param.Desc)
-		service.Push(strings.Split(recv, ";"))
-	})
+func Schedule(scheduler gocron.Scheduler, service push.Service, param SchedParam) {
+	cron := db.GetProp(param.CronProp, "* * 1 * *")
+	_, err := scheduler.NewJob(
+		gocron.CronJob(cron, false),
+		gocron.NewTask(func() {
+			recv := db.GetProp(param.RecvProp, "")
+			if recv == "" {
+				slog.Info("task not executed because recipients is empty", "task", param.Desc)
+				return
+			}
+			slog.Info("execute", "task", param.Desc)
+			service.Push(strings.Split(recv, ";"))
+		}),
+	)
 	if err != nil {
 		slog.Warn(err.Error())
 	} else {

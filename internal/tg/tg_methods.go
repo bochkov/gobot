@@ -69,6 +69,15 @@ func (sm *SendMessage[T]) Describe() (string, any) {
 	return "sendMessage", &Message{}
 }
 
+type DeleteMessage[T IntOrString] struct {
+	ChatId    T     `json:"chat_id"`
+	MessageId int64 `json:"message_id"`
+}
+
+func (sm *DeleteMessage[T]) Describe() (string, any) {
+	return "deleteMessage", nil
+}
+
 type SendPhoto[T IntOrString] struct {
 	ChatId T      `json:"chat_id"`
 	Photo  string `json:"photo"`

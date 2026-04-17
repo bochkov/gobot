@@ -7,7 +7,7 @@ import (
 	"github.com/bochkov/gobot/internal/lib/tasks"
 	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
-	"github.com/go-co-op/gocron"
+	"github.com/go-co-op/gocron/v2"
 )
 
 type taskService struct {
@@ -18,18 +18,26 @@ func NewTaskService(db TaskRepository) tasks.Scheduled {
 	return &taskService{db: db}
 }
 
-func (ts *taskService) Schedule(scheduler *gocron.Scheduler) {
+func (ts *taskService) Schedule(scheduler gocron.Scheduler) {
 	var err error
 	ctx := context.Background()
 
 	// At 12:00.
-	_, err = scheduler.Cron("0 12 * * *").Do(ts.fetchCurrencies, ctx)
+	_, err = scheduler.NewJob(
+		gocron.CronJob("0 12 * * *", false),
+		gocron.NewTask(ts.fetchCurrencies),
+		gocron.WithContext(ctx),
+	)
 	if err != nil {
 		slog.Error(err.Error())
 	}
 
 	// At 12:00 on every day-of-week from Monday through Friday
-	_, err = scheduler.Cron("0 12 * * 1-5").Do(ts.fetchRates, ctx)
+	_, err = scheduler.NewJob(
+		gocron.CronJob("0 12 * * 1-5", false),
+		gocron.NewTask(ts.fetchRates),
+		gocron.WithContext(ctx),
+	)
 	if err != nil {
 		slog.Error(err.Error())
 	}

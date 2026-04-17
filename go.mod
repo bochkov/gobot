@@ -7,7 +7,7 @@ require (
 	github.com/antchfx/htmlquery v1.3.6
 	github.com/carlmjohnson/requests v0.25.1
 	github.com/go-chi/chi/v5 v5.2.5
-	github.com/go-co-op/gocron v1.37.0
+	github.com/go-co-op/gocron/v2 v2.21.0
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/lmittmann/tint v1.1.3
 	github.com/microcosm-cc/bluemonday v1.0.27
@@ -24,6 +24,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect

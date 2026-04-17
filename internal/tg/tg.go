@@ -6,6 +6,7 @@ import (
 
 type Service interface {
 	push.Service
+	Exec(method Method, token string) (bool, error)
 	Execute(method Method, token string) (*TypedResult[any], error)
 	GetAnswers(chatId int64, txt string) []Method
 }

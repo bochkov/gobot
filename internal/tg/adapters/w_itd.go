@@ -43,7 +43,7 @@ func (w *WItdAdapter) PushData(receivers []string) ([]tg.Method, error) {
 	}
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("<b>%s</b>\n", t.Date))
+	fmt.Fprintf(&sb, "<b>%s</b>\n", t.Date)
 	if t.WorldDay != "" {
 		sb.WriteString(t.WorldDay)
 	}

@@ -10,21 +10,28 @@ import (
 	"log/slog"
 
 	"github.com/bochkov/gobot/internal/lib/db"
+	"github.com/bochkov/gobot/internal/repo"
 	"github.com/bochkov/gobot/internal/util"
 	"github.com/carlmjohnson/requests"
 )
 
 type service struct {
-	adapters []TgAnswerAdapter
-	push     TgPushAdapter
+	tmpMsgDao    repo.TmpMsgDao
+	adapters     []TgAnswerAdapter
+	push         TgPushAdapter
+	temporaryMsg bool
 }
 
 func NewAnswerService(adapters ...TgAnswerAdapter) Service {
-	return &service{adapters: adapters}
+	return &service{adapters: adapters, temporaryMsg: false}
 }
 
 func NewPushService(push TgPushAdapter) Service {
-	return &service{push: push}
+	return &service{push: push, temporaryMsg: false}
+}
+
+func NewPushTmpService(push TgPushAdapter, tmpMsgDao repo.TmpMsgDao) Service {
+	return &service{push: push, temporaryMsg: true, tmpMsgDao: tmpMsgDao}
 }
 
 func (s service) GetAnswers(chatId int64, txt string) []Method {
@@ -40,10 +47,12 @@ func (s service) GetAnswers(chatId int64, txt string) []Method {
 func (s service) Execute(method Method, token string) (*TypedResult[any], error) {
 	methodName, methodResponse := method.Describe()
 	slog.Info("request", "method", methodName, "body", util.ToJson(method))
-	res := &TypedResult[any]{
-		Result: methodResponse,
-	}
-	reqBuilder := requests.URL(fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, methodName))
+
+	apiUrl := fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, methodName)
+	reqBuilder := requests.
+		URL(apiUrl).
+		Method(http.MethodPost)
+
 	if reflect.ValueOf(method).Elem().FieldByName("InputFile").IsValid() {
 		buf := &bytes.Buffer{}
 		contentType, err := ToMultipart(method.(MultipartMethod), buf)
@@ -54,13 +63,28 @@ func (s service) Execute(method Method, token string) (*TypedResult[any], error)
 	} else {
 		reqBuilder.BodyJSON(&method)
 	}
+
+	res := &TypedResult[any]{Result: methodResponse}
 	if err := reqBuilder.
-		Method(http.MethodPost).
 		ToJSON(res).
 		Fetch(context.Background()); err != nil {
 		return nil, err
 	}
 	return res, nil
+}
+
+func (s service) Exec(method Method, token string) (bool, error) {
+	methodName, _ := method.Describe()
+	slog.Info("request", "method", methodName, "body", util.ToJson(method))
+	apiUrl := fmt.Sprintf("https://api.telegram.org/bot%s/%s", token, methodName)
+	if err := requests.
+		URL(apiUrl).
+		Method(http.MethodPost).
+		BodyJSON(&method).
+		Fetch(context.Background()); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (s service) Push(recepients []string) {
@@ -76,8 +100,18 @@ func (s service) Push(recepients []string) {
 		return
 	}
 	for _, m := range sm {
-		if _, exec := s.Execute(m, token); exec != nil {
+		res, exec := s.Execute(m, token)
+		if exec != nil {
 			slog.Warn(exec.Error())
 		}
+		if res.Ok && s.temporaryMsg {
+			msg := res.Result.(*Message)
+			s.scheduleToRemove(msg.Chat.Id, msg.Id)
+		}
 	}
+}
+
+func (s service) scheduleToRemove(chatId int64, msgId int64) {
+	slog.Info("scheduled to remove", "chatId", chatId, "msgId", msgId)
+	s.tmpMsgDao.Save(context.Background(), chatId, msgId)
 }
