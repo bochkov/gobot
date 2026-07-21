@@ -91,7 +91,7 @@ func main() {
 	/// logging
 	slog.SetDefault(
 		slog.New(
-			tint.NewHandler(
+			tint.NewTextHandler(
 				os.Stdout,
 				&tint.Options{
 					TimeFormat: time.DateTime,

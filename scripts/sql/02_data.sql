@@ -237,6 +237,7 @@ insert into region (id, name) values (66, 'Свердловская област
 insert into code (val, region_id) values ('66', 66);
 insert into code (val, region_id) values ('96', 66);
 insert into code (val, region_id) values ('196', 66);
+insert into code (val, region_id) values ('166', 66);
 
 insert into region (id, name) values (67, 'Смоленская область');
 insert into code (val, region_id) values ('67', 67);

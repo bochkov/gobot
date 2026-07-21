@@ -1,8 +1,6 @@
 package wiki
 
 import (
-	"strings"
-
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -21,8 +19,8 @@ type PicOfDay struct {
 }
 
 func sanitizeHtml(p *bluemonday.Policy, source string) string {
-	html := strings.ReplaceAll(
-		source, "//ru.wikipedia.org/", "https://ru.wikipedia.org/",
-	)
-	return p.Sanitize(html)
+	// html := strings.ReplaceAll(
+	// 	source, "//ru.wikipedia.org/", "https://ru.wikipedia.org/",
+	// )
+	return p.Sanitize(source)
 }
