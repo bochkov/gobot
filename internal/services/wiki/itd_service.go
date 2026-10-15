@@ -53,7 +53,7 @@ func (s *ItdService) Itd() (*ThisDay, error) {
 	img, _ := htmlquery.Query(todayNode, "//figure/a/img")
 	if img != nil {
 		src := "https:" + htmlquery.SelectAttr(img, "src")
-		res.ImgSrc = regexp.MustCompile(`\d+px`).ReplaceAllString(src, "1000px")
+		res.ImgSrc = regexp.MustCompile(`\d+px`).ReplaceAllString(src, "960px")
 	}
 
 	list, err := htmlquery.QueryAll(todayNode, "//ul/li")
